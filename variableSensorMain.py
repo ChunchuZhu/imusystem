@@ -284,7 +284,7 @@ if __name__ == "__main__":
     objLHeel = sensorObject("LH")
 
     objLowBack = sensorObject("LB")
-    objTopBack = sensorObject("LB")
+    objTopBack = sensorObject("LB") # UB
 
     
     #create gait detect objects for each leg
