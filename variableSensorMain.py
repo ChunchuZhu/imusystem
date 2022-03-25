@@ -57,6 +57,7 @@ def data_handler(address, *args):
 
     ###########################################################################################
     #Pull data from [Chadi Load Cell] if enabled----------------------------------------------------------------------
+    #stream loadcell variables from arduino if true
     if loadCell:
         if parent_conn_arduino.poll(0):
             loadcell_data = parent_conn_arduino.recv()
@@ -64,6 +65,7 @@ def data_handler(address, *args):
     ###########################################################################################
     #PULL DATA FROM NOTOCHORD-----------------------------------------------------------------------------------------------------------------------------
     #Collects variable type and sensor address
+    #  why？
     out = []
     varType = address[10]
     addr = ''
@@ -293,7 +295,7 @@ if __name__ == "__main__":
     
     #TODO: redo kneeling detect object
     kneelingDetect = kneelingDetection(NMKG, mass, height, alpha, torqueCutoff, ramping_delay_time, ramping_hold_time, ramping_slope, controller_type)
-
+    
     
     #Create lists that can be cycled through to iterate over every object for exporting (and creating the dump file data header).
     objects = []

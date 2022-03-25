@@ -198,9 +198,6 @@ def receive_from_nuc(serialPort):
 
 
 
-
-
-
 def receive_from_arduino(serialPort):
     import struct
 #[165, val loByte, val hiByte]
