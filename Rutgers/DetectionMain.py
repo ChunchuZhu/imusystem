@@ -17,7 +17,6 @@ from packageHandlerFunc import * #package_handler_raw(tup)
 from sensorClass import * #class sensorObject, newValues(valueArray), angularAccCalc(), angleCalc(gaitDetectObject)
 from serialSend import * #ardno(msg as string)
 from slipAlgorithmFunc import * #slipAlgorithm(pelvis_forward_acc, heel_forward_acc, L_hh)
-from kneelingAlgorithm import * #kneelingDetection.kneelingDetection(objRT, objRS, objRH, objLT, objLS, objLH)
 from CUNYreceiver import *
 from NUCreceiver import *
 from ARDUINOreceiver import *
@@ -165,61 +164,6 @@ def data_handler(address, *args):
 
         # Add output string to file
         fileDump.write(f"{outputString}")
-
-
-    ###########################################################################################
-        # DATA OUTPUT (CONSOLE) -------------------------------------------------------------------------------------------------------------
-
-
-		# Print easy-reading values to terminal
-        if not nucSend:
-            if loadCell:
-                print(f"Read Rate: {np.round(1/timeToRun, 2)}\t{loadcell_data}")
-            else:
-                ttr = time.time() - tic
-                print(f"Read Rate: {np.round(1/timeToRun, 2)}\t{np.round(kneeAngleR, 2)}\t{np.round(kneeAngleL, 2)}\t{np.round(objRThigh.xAngleZeroed, 2)}\t{np.round(ttr, 5)}")
-
-
-    ###########################################################################################
-        # DATA OUTPUT (SERIAL SEND) ---------------------------------------------------------------------------------------------------
-
-        #IMPORTANT: msgArray NEW FORMAT IN ACCORDANCE WITH ALBORZ COMMUNICATION PROTOCOL
-        #[ 111, time,
-        #  LHAX, LHAY, LHAZ, LHGX, LHGY, LHGZ, LHAngle,      RHAX, RHAY, RHAZ, RHGX, RHGY, RHGZ, RHAngle,
-        #  LSAX, LSAY, LSAZ, LSGX, LSGY, LSGZ, LSAngle,      RSAX, RSAY, RSAZ, RSGX, RSGY, RSGZ, RSAngle,
-        #  LTAX, LTAY, LTAZ, LTGX, LTGY, LTGZ, LTAngle,      RTAX, RTAY, RTAZ, RTGX, RTGY, RTGZ, RTAngle,
-        #  LBAX, LBAY, LBAZ, LBGX, LBGY, LBGZ, LBAngle,
-        #  gaitL, gaitR, slipL, slipR, TorqueL, TorqueR ]
-
-        #To extract values:
-        #Torque = x * 0.002
-        #Angle = x * .0125
-        #Accelerometer = x * 0.002394
-        #Gyroscope = x * 0.07
-        #Magnetometer = x * 0.00014
-
-        # Compile and send data to MatLab Simulink program
-        if nucSend:
-            serialArr = [1.0/timeToRun]
-            for x in [objLHeel, objRHeel, objLShank, objRShank, objLThigh, objRThigh, objLowBack]:
-                serialArr += [int(x.acX_norm/2), int(x.acY_norm/2), int(x.acZ_norm/2), int(x.gyX_norm/2), int(x.gyY_norm/2), int(x.gyZ_norm/2), int(x.zAngleZeroed * 80)]
-            serialArr += [int(gaitDetectRight.gaitStage), int(gaitDetectLeft.gaitStage), int(slipRight/(10**32)), int(slipLeft/(10**32)), int(kneelingTorqueEstimationL * 500), int(kneelingTorqueEstimationR * 500)]
-                    
-            print(f"Read Rate: {1/timeToRun}") #print(serialArr)
-
-            #print("%9.5f %9.5f %9.5f" %(1.0/timeToRun, kneelingTorqueEstimationL, kneelingTorqueEstimationR))
-            send_over_serial(serialArr, intelNUCserial)
-
-###########################################################################################
-    # DATA OUTPUT (Stream perturbed leg gait variables to brace arduino) ---------------------------------------------------------------------------------------------------
-        
-        if streamGait:
-           send_to_brace(gaitDetectLeft.gaitOutput, gaitSerial)
-
-## End of main reader function
-
-
-
 
 
 
