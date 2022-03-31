@@ -86,16 +86,15 @@ if __name__ == "__main__":
         objects.append(objLHeel)
         stringObjects.append("LHeel")    
   
-        
     stringAxes = ["x","y","z"]
     #stringSensors = ["gy","ac","mg"] # Use in place of below line if adding magnetometer readings to file output
     stringSensors = ["av","ac"]
     
-    serial_conn = serial.Serial('/dev/cu.usbmodem102558701', 115200, timeout=None)
+    serial_conn = serial.Serial('/dev/ttyACM0', 115200, timeout=None)
     # serial_conn = serial.Serial('/dev/ttyACM0', 115200, timeout=None)
     timestr = time.strftime("%Y%m%d-%H%M%S")
     file_name = "Data/" + "data-" + timestr + ".txt"
-    file1 = open(file_name, "w")
+    file1 = open("test.txt", "w")
 
     header = "time\ttimeToRun\tgaitStageR\tgaitStageL\tslipR\tslipL\t\t"
     for x in stringObjects:
@@ -105,7 +104,7 @@ if __name__ == "__main__":
         header += f"zAngleZeroed/{x}\t"
         header += f"\t"
     header += f"\n"
-    file1.write(header)
+    # file1.write(header)
 
 
     # Calibrate Z zero angles 
@@ -122,11 +121,11 @@ if __name__ == "__main__":
     # Define z-zeroed angles:
     dataPacket=str(dataPacket,'utf-8')
     splitPacket=dataPacket.split(',')
-    
+    print(len(splitPacket))
     i = 0
-    for x in stringObjects:
-            x.zAngleZeroed = (float(splitPacket[i+8]))
-            i+=9
+    for x in objects:
+        x.zAngleZeroed = float(splitPacket[i+6])
+        i+=9
 
     t_calibrate_count =0
     while t_calibrate_count < 100:
@@ -145,43 +144,48 @@ if __name__ == "__main__":
         # Define z-zeroed angles:
         dataPacket=str(dataPacket,'utf-8')
         splitPacket=dataPacket.split(',')
-        
-        for x in stringObjects:
-            x.zAngleZeroed = (x.zAngleZeroed + float(splitPacket[i+8]))/2
+        # print(splitPacket)
+        # print(len(splitPacket))  
+        for x in objects:
+            x.zAngleZeroed = (x.zAngleZeroed + float(splitPacket[i+6]))/2
             i+=9
-    t_calibrate_count +=1
+        t_calibrate_count +=1
 
-             
+    print(objRHeel.zAngleZeroed)
+    print(objLHeel.zAngleZeroed)
+
+    t0 = time.time()
+
     try:
-        #  Read Data From Teensy
-        time_start = time.time()
+        while True:
+            #  Read Data From Teensy
+            time_start = time.time()
 
-        dataPacket=serial_conn.readline()
-        while not '\\n'in str(dataPacket):         # check if full data is received. 
-            # This loop is entered only if serial read value doesn't contain \n
-            # which indicates end of a sentence. 
-            # str(val) - val is byte where string operation to check `\\n` 
-            # can't be performed
-            time.sleep(.001)                # delay of 1ms 
-            temp = serial_conn.readline()           # check for serial output.
-            if len(dataPacket) < 18:
-                dataPacket = [dataPacket, temp]
+            dataPacket=serial_conn.readline()
+            while not '\\n'in str(dataPacket):         # check if full data is received. 
+                # This loop is entered only if serial read value doesn't contain \n
+                # which indicates end of a sentence. 
+                # str(val) - val is byte where string operation to check `\\n` 
+                # can't be performed
+                time.sleep(.001)                # delay of 1ms 
+                temp = serial_conn.readline()           # check for serial output.
+                if len(dataPacket) < 18:
+                    dataPacket = [dataPacket, temp]
 
-        freq = 1/(time.time()-time_start)
-        dataPacket=str(dataPacket,'utf-8')
-        splitPacket=dataPacket.split(',')
-        print(freq)
+            freq = 1/(time.time()-time_start)
+            dataPacket=str(dataPacket,'utf-8')
+            splitPacket=dataPacket.split(',')
+            # print(freq)
 
-        i = 0
-        for x in stringObjects:
-            x.AssignIMUData(splitPacket[i:i+6])
-            i+=9
-        
-        # file1.writelines(','.join(str(j) for j in one_reading) + '\n')
+            i = 0
+            for x in objects:
+                x.AssignIMUData(splitPacket[i:i+7])
+                i+=9
+            # file1.writelines(','.join(str(j) for j in one_reading) + '\n')
 
-        # Runs calculations every [processing_frequency] with whatever values are present -----------------------------------------------------------------
-        if (time.time() - timeCurrent) >= (1/processing_frequency):
-            
+            # Runs calculations every [processing_frequency] with whatever values are present -----------------------------------------------------------------
+            # if (time.time() - timeCurrent) >= (1/processing_frequency):
+                
             #DETECTION ALGORITHMS AND OTHER SECONDARY CALCS -------------------------------------------------------------------------------------------------
             #Code is broken into reader above and algorithms below for increased customization and ease of changing algorithm. Everything below this line is almost entirely customizable.
 
@@ -194,11 +198,21 @@ if __name__ == "__main__":
             gaitDetectRight.testVal(objRThigh.gyZ, objRShank.gyZ, objRHeel.gyZ)
             gaitDetectLeft.testVal(objLThigh.gyZ, objLShank.gyZ, objLHeel.gyZ)
 
+            forwardFootAccRight = (objRHeel.acX * np.cos( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745)) - (objRHeel.acY * np.sin( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745))
+            forwardFootAccLeft = (objLHeel.acX * np.cos( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745)) - (objLHeel.acY * np.sin( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745))
             #Slip Algorithm - Calculates Slip Indicator from Trkov IFAC 2017 paper
-            slipRight = gaitDetectRight.slipTrkov(objLowBack.acX, ((objRHeel.acX * np.cos( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745)) - (objRHeel.acY * np.sin( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745))), hip_heel_length)
-            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acX, ((objLHeel.acX * np.cos( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745)) - (objLHeel.acY * np.sin( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745))), hip_heel_length)
+            slipRight = gaitDetectRight.slipTrkov(objLowBack.acX, forwardFootAccRight, hip_heel_length)
+            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acX, forwardFootAccLeft , hip_heel_length)
 
-
+            # print(objLHeel.gyX)
+            # print(objLHeel.gyY)
+            # print(objLHeel.gyZ)
+            # print(objLHeel.zAngle)
+            # print(objRHeel.zAngle)
+            # print(objLHeel.acX)
+            print(objLowBack.acY)
+            # print(forwardFootAccRight)
+            # print(forwardFootAccLeft)
         ###########################################################################################
             #DATA OUTPUT (FILE) -------------------------------------------------------------------------------------------------------------
 
@@ -220,11 +234,19 @@ if __name__ == "__main__":
                 outputString += f"\t"
 
             # Add output string to file
-            file1.write(f"{outputString}")
+            # file1.write(f"{outputString}")
+            # if slipRight != 0:
+            #     print(slipRight)
+            # if slipLeft != 0:
+            #     print(slipLeft)
+            # print(slipRight)
+        
+            # print(slipLeft)
 
-
+            if(time.time() - t0) > 300:
+                break
     except KeyboardInterrupt:
         serial_conn.close()
             # 5: Encode and send torques to teensy
-        file1.close()
+        # file1.close()
         print('Program Interrupted! Closing...')
