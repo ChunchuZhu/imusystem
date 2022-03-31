@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 #Importing python libraries
-from pythonosc.dispatcher import Dispatcher
-from pythonosc.osc_server import BlockingOSCUDPServer
 from multiprocessing import Process,Queue,Pipe
 import serial
 import time
@@ -91,7 +89,7 @@ if __name__ == "__main__":
         
     stringAxes = ["x","y","z"]
     #stringSensors = ["gy","ac","mg"] # Use in place of below line if adding magnetometer readings to file output
-    stringSensors = ["gy","ac"]
+    stringSensors = ["av","ac"]
     
     serial_conn = serial.Serial('/dev/cu.usbmodem102558701', 115200, timeout=None)
     # serial_conn = serial.Serial('/dev/ttyACM0', 115200, timeout=None)
@@ -103,12 +101,14 @@ if __name__ == "__main__":
     for x in stringObjects:
         for y in stringSensors:
             for z in stringAxes:
-                header += f"{y}/{z}/{x}\t"
-        header += f"zAngle/{x}\txAngle/{x}\t"
+                header += f"{x}/{y}/{z}\t"
+        header += f"zAngleZeroed/{x}\t"
         header += f"\t"
-
     header += f"\n"
     file1.write(header)
+
+
+    # Calibrate Z zero angles 
     dataPacket=serial_conn.readline()
     while not '\\n'in str(dataPacket):         # check if full data is received. 
         # This loop is entered only if serial read value doesn't contain \n
@@ -122,14 +122,40 @@ if __name__ == "__main__":
     # Define z-zeroed angles:
     dataPacket=str(dataPacket,'utf-8')
     splitPacket=dataPacket.split(',')
+    
     i = 0
     for x in stringObjects:
-        x.AngleZeroed(splitPacket[i+6:i+8])
-        i+=8
-               
+            x.zAngleZeroed = (float(splitPacket[i+8]))
+            i+=9
+
+    t_calibrate_count =0
+    while t_calibrate_count < 100:
+        i = 0
+        #  read data
+        dataPacket=serial_conn.readline()
+        while not '\\n'in str(dataPacket):         # check if full data is received. 
+            # This loop is entered only if serial read value doesn't contain \n
+            # which indicates end of a sentence. 
+            # str(val) - val is byte where string operation to check `\\n` 
+            # can't be performed
+            time.sleep(.001)                # delay of 1ms 
+            temp = serial_conn.readline()           # check for serial output.
+            if len(dataPacket) < 18:
+                dataPacket = [dataPacket, temp]
+        # Define z-zeroed angles:
+        dataPacket=str(dataPacket,'utf-8')
+        splitPacket=dataPacket.split(',')
+        
+        for x in stringObjects:
+            x.zAngleZeroed = (x.zAngleZeroed + float(splitPacket[i+8]))/2
+            i+=9
+    t_calibrate_count +=1
+
+             
     try:
         #  Read Data From Teensy
         time_start = time.time()
+
         dataPacket=serial_conn.readline()
         while not '\\n'in str(dataPacket):         # check if full data is received. 
             # This loop is entered only if serial read value doesn't contain \n
@@ -144,13 +170,12 @@ if __name__ == "__main__":
         freq = 1/(time.time()-time_start)
         dataPacket=str(dataPacket,'utf-8')
         splitPacket=dataPacket.split(',')
+        print(freq)
 
-        one_reading = [freq,float(splitPacket[3]),float(splitPacket[4]),float(splitPacket[5]),float(splitPacket[0]),float(splitPacket[1]),float(splitPacket[2]),float(splitPacket[6]),float(splitPacket[7]),float(splitPacket[8]),float(splitPacket[12]),float(splitPacket[13]),float(splitPacket[14]),float(splitPacket[9]),float(splitPacket[10]),float(splitPacket[11]),float(splitPacket[15]),float(splitPacket[16]),float(splitPacket[17])]
-        
         i = 0
         for x in stringObjects:
-            x.AssignIMUData(splitPacket[i:i+7])
-            i+=7
+            x.AssignIMUData(splitPacket[i:i+6])
+            i+=9
         
         # file1.writelines(','.join(str(j) for j in one_reading) + '\n')
 
@@ -170,8 +195,8 @@ if __name__ == "__main__":
             gaitDetectLeft.testVal(objLThigh.gyZ, objLShank.gyZ, objLHeel.gyZ)
 
             #Slip Algorithm - Calculates Slip Indicator from Trkov IFAC 2017 paper
-            slipRight = gaitDetectRight.slipTrkov(objLowBack.acX, ((objRHeel.acX * np.cos(objRHeel.zAngleZeroed * .01745)) - (objRHeel.acY * np.sin(objRHeel.zAngleZeroed * .01745))), hip_heel_length)
-            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acX, ((objLHeel.acX * np.cos(objLHeel.zAngleZeroed * .01745)) - (objLHeel.acY * np.sin(objLHeel.zAngleZeroed * .01745))), hip_heel_length)
+            slipRight = gaitDetectRight.slipTrkov(objLowBack.acX, ((objRHeel.acX * np.cos( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745)) - (objRHeel.acY * np.sin( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745))), hip_heel_length)
+            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acX, ((objLHeel.acX * np.cos( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745)) - (objLHeel.acY * np.sin( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745))), hip_heel_length)
 
 
         ###########################################################################################
@@ -191,7 +216,6 @@ if __name__ == "__main__":
                 outputString += f"{x.acZ}\t"
 
                 outputString += f"{x.zAngleZeroed}\t"
-                outputString += f"{x.xAngleZeroed}\t"
                 
                 outputString += f"\t"
 

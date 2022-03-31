@@ -275,6 +275,9 @@ class sensorObject:
         self.mgY = self.mgY * self.mgConversion
         self.mgZ = self.mgZ * self.mgConversion
         
+    # The code frame is provided by rowan/Duncan
+    # when assign IMU data, we need to pay attention to the coordinate
+    # 
     def AssignIMUData(self,splitPacket):
         self.gyX = float(splitPacket[0])
         self.gyY = float(splitPacket[1])
@@ -284,10 +287,5 @@ class sensorObject:
         self.acY = float(splitPacket[4])
         self.acZ = float(splitPacket[5])
         
-        self.xAngle = float(splitPacket[6])
-        self.zAngle = float(splitPacket[8])
+        self.zAngle = float(splitPacket[6])
         
-        
-    def AngleZeroed(self, data):    
-        self.xAngleZeroed = float(data[6])
-        self.zAngleZeroed = float(data[8])
