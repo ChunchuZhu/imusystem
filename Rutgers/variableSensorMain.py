@@ -93,7 +93,8 @@ if __name__ == "__main__":
     serial_conn = serial.Serial('/dev/ttyACM0', 115200, timeout=None)
     # serial_conn = serial.Serial('/dev/ttyACM0', 115200, timeout=None)
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    file1 = open("test.txt", "w")
+    file_name = "Rutgers/Data/" + "data-" + timestr + ".txt"
+    file1 = open(file_name, "w")
 
     header = "time\ttimeToRun\tgaitStageR\tgaitStageL\tslipR\tslipL\t\t"
     for x in stringObjects:
@@ -209,14 +210,14 @@ if __name__ == "__main__":
             # print(objLHeel.zAngle)
             # print(objRHeel.zAngle)
             # print(objLHeel.acX)
-            print(objLowBack.acY)
+            # print(objLowBack.acY)
             # print(forwardFootAccRight)
             # print(forwardFootAccLeft)
         ###########################################################################################
             #DATA OUTPUT (FILE) -------------------------------------------------------------------------------------------------------------
 
             #Create beginning of output string - time, time between measurements, right gait stage, left gait stage, left slip detector, right slip detector
-            outputString = f"{time.time() - timeStart}\t{timeToRun}\t{gaitDetectRight.gaitStage}\t{gaitDetectLeft.gaitStage}\t{slipRight}\t{slipLeft}\t\t"
+            outputString = f"{freq}\t{timeToRun}\t{gaitDetectRight.gaitStage}\t{gaitDetectLeft.gaitStage}\t{slipRight}\t{slipLeft}\t\t"
 
             #Cycle through all sensor objects to append formatted version of every sensor's raw data to output string
             for x in objects:
@@ -228,12 +229,14 @@ if __name__ == "__main__":
                 outputString += f"{x.acY}\t"
                 outputString += f"{x.acZ}\t"
 
+                outputString += f"{x.zAngle}\t"
                 outputString += f"{x.zAngleZeroed}\t"
                 
                 outputString += f"\t"
-
+            
+            # file1.writelines(','.join(str(j) for j in outputString) + '\n')
             # Add output string to file
-            # file1.write(f"{outputString}")
+            file1.writelines(f"{outputString}" +"\n")
             # if slipRight != 0:
             #     print(slipRight)
             # if slipLeft != 0:
@@ -247,5 +250,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         serial_conn.close()
             # 5: Encode and send torques to teensy
-        # file1.close()
+        file1.close()
         print('Program Interrupted! Closing...')
