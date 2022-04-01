@@ -93,7 +93,6 @@ if __name__ == "__main__":
     serial_conn = serial.Serial('/dev/ttyACM0', 115200, timeout=None)
     # serial_conn = serial.Serial('/dev/ttyACM0', 115200, timeout=None)
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    file_name = "Data/" + "data-" + timestr + ".txt"
     file1 = open("test.txt", "w")
 
     header = "time\ttimeToRun\tgaitStageR\tgaitStageL\tslipR\tslipL\t\t"
