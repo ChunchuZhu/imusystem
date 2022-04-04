@@ -5,7 +5,6 @@ sys.path.append('/usr/local/lib/python3.8/dist-packages')
 
 from pyvicon import *
 
-
 def vicon_init(IP_ADDRESS):
     vicon_stream = PyVicon()
     print("SDK version : {}".format(vicon_stream.__version__))

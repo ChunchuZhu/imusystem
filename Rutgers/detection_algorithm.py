@@ -7,14 +7,6 @@ from numpy import std
 from numpy import dstack
 from pandas import read_csv
 from tensorflow import keras
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import Dropout
-from tensorflow.keras.layers import LSTM
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.models import load_model
-from tensorflow.keras import backend
 from matplotlib import pyplot
 import pandas as pd
 from sklearn import datasets, linear_model
@@ -22,7 +14,6 @@ from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 import pandas
 from numpy import array
-from detection_initialization import *
 
 
 def get_phase_angle(angle_ref_list, type_walk):

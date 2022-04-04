@@ -10,8 +10,8 @@ def IMU_init():
     convM = 1.0  #
 
     # serialPort = '/dev/rfcomm0'  # /dev/ttyUSB0 # change this line if bluetooth or other port
-    # serialPort = '/dev/ttyUSB0'
-    serialPort = '/dev/cu.usbmodem102558701'
+    serialPort = '/dev/ttyACM0'
+    # serialPort = '/dev/cu.usbmodem102558701'
     # serialPort = '/dev/cu.usbmodem84041401'
     serialBaud = 115200
 
