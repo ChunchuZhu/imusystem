@@ -28,6 +28,7 @@ def receive_from_IMU(serial_conn):
                 dataPacket = [dataPacket, temp]
         dataPacket=str(dataPacket,'utf-8')
         splitPacket=dataPacket.split(',')
+        print(splitPacket)
         freq = 1/(time.time()-time_start)
 
     except KeyboardInterrupt:

@@ -30,4 +30,4 @@ def vicon_init(IP_ADDRESS):
 
 
 if __name__ == "__main__":
-    vicon_stream, subject_name,  marker_count = vicon_init("192.168.10.203")
+    vicon_stream, subject_name,  marker_count = vicon_init("192.168.10.200")

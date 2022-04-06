@@ -27,8 +27,8 @@ def IMU_init():
     print('Trying to connect to ' + str(serialPort) +
           ' at ' + str(serialBaud) + ' BAUD.')
     try:
-        serial_conn = serial.Serial('/dev/cu.usbmodem102558701', 115200, timeout=None)
-        print('Connected!')
+        serial_conn = serial.Serial(serialPort, 115200, timeout=None)
+        print('Teensy Connected!')
     except:
         print("Failed to connect with " + str(serialPort) +
               ' at ' + str(serialBaud) + ' BAUD.')

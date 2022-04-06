@@ -27,7 +27,6 @@ from variableDeclarations import *
 from IMU_read import *
 from IMU_initialization import *
 from IMU_receiver import *
-from detection_algorithm import *
 import numpy as np
 from vicon_initialization import *
 from vicon_receiver import *
@@ -121,8 +120,8 @@ if __name__ == "__main__":
 
     #########################################################################################
     # vicon_stream, subject_name, marker_count = vicon_init("192.168.10.203")
-    IP_ADDRESS = "192.168.1.10"
-    vicon_enable = False
+    IP_ADDRESS = "192.168.10.200"
+    vicon_enable = True
     #########################################################################################
 
 
@@ -152,7 +151,7 @@ if __name__ == "__main__":
     data_record_list = []
 
 
-    header = "time\ttimeToRun\tgaitStageR\tgaitStageL\tslipR\tslipL\t\t"
+    header = "time\ttimeToRun\tgaitStageR\tgaitStageL\tslipR\tslipL\t"
     for x in stringObjects:
         for y in stringSensors:
             for z in stringAxes:
@@ -164,6 +163,7 @@ if __name__ == "__main__":
 
     #  Zero z_angles
     IMU_data = child_conn_IMU.recv()
+    print('IMU Length',len(IMU_data))
     i = 0
     for x in objects:
         x.zAngleZeroed = float(IMU_data[i+6])
@@ -180,8 +180,8 @@ if __name__ == "__main__":
             i+=9
         t_calibrate_count +=1
 
-    print("Right Heel Z-angle zeroed:"+objRHeel.zAngleZeroed)
-    print("Left Heel Z-angle zeroed:"+objLHeel.zAngleZeroed)
+    print("Right Heel Z-angle zeroed:",objRHeel.zAngleZeroed)
+    print("Left Heel Z-angle zeroed:",objLHeel.zAngleZeroed)
 
     t0 = time.time()
 
@@ -195,7 +195,7 @@ if __name__ == "__main__":
             
             IMU_data = child_conn_IMU.recv()
             # print(IMU_data)
-            # print(1)
+            # print('IMU received')
 
             vicon_data_flat = []
 
@@ -215,6 +215,7 @@ if __name__ == "__main__":
                 vicon_data_flat = vicon_data_list
                 # vicon_data_flat = [item for x in vicon_data_list for item in x]
                     # print("VICON data:", vicon_data_flat[0:3])
+            # print('Vicon received')
 
             current_freq = 1/(time.time() - time_start)
             # Run detection
@@ -235,10 +236,10 @@ if __name__ == "__main__":
 
             # Data format of output is plain txt
             data_record = [current_frame, current_freq]
-            data_record.extend(gaitDetectRight.gaitStage)
-            data_record.extend(gaitDetectLeft.gaitStage)
-            data_record.extend(slipRight)
-            data_record.extend(slipRight)
+            data_record.append(gaitDetectRight.gaitStage)
+            data_record.append(gaitDetectLeft.gaitStage)
+            data_record.append(slipRight)
+            data_record.append(slipRight)
 
             if not IMU_data:
                 IMU_data = [None] * 63
@@ -249,13 +250,13 @@ if __name__ == "__main__":
                 data_record.extend(vicon_data_flat)
                 data_record.extend(IMU_data)
                 if vicon_data_flat[0] and IMU_data[0]:
-                    print("%10.4f, %10.4f, %10.4f, %10.4f, %10.4f, %10.4f, %10.4f" % (current_freq, IMU_data[3], IMU_data[17], IMU_data[31], IMU_data[45], IMU_data[59], vicon_data_flat[0]))
+                    print('IMU and Vicon')
             else:
                 data_record.extend(IMU_data)
                 if IMU_data[0]:
-                    print("%10.4f, %10.4f, %10.4f, %10.4f, %10.4f, %10.4f" % (current_freq, IMU_data[3], IMU_data[17], IMU_data[31], IMU_data[45], IMU_data[59],))
+                    print("IMU only" )
             data_record_list.append(data_record)
-
+            # print(vicon_data_flat)
             file1.writelines(','.join(str(j) for j in data_record) + '\n')
 
             current_frame += 1

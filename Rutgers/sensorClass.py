@@ -278,14 +278,14 @@ class sensorObject:
     # The code frame is provided by rowan/Duncan
     # when putting on IMUs, we need to pay attention to the coordinate
     # 
-    # def AssignIMUData(self,splitPacket):
-    #     self.gyX = float(splitPacket[0])
-    #     self.gyY = float(splitPacket[1])
-    #     self.gyZ = float(splitPacket[2])
+    def AssignIMUData(self,splitPacket):
+        self.gyX = float(splitPacket[0])
+        self.gyY = float(splitPacket[1])
+        self.gyZ = float(splitPacket[2])
         
-    #     self.acX = float(splitPacket[3])
-    #     self.acY = float(splitPacket[4])
-    #     self.acZ = float(splitPacket[5])
+        self.acX = float(splitPacket[3])
+        self.acY = float(splitPacket[4])
+        self.acZ = float(splitPacket[5])
         
-    #     self.zAngle = float(splitPacket[6])
+        self.zAngle = float(splitPacket[6])
         
