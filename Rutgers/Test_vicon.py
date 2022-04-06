@@ -51,12 +51,11 @@ if __name__ == "__main__":
     vicon_enable = True
     #########################################################################################
 
-
     if vicon_enable:
         (parent_conn_vicon, child_conn_vicon) = Pipe()
         sender_vicon = Process(target = async_vicon, args = (parent_conn_vicon, IP_ADDRESS))
         sender_vicon.start()
-        print("Vicon Connected")
+    
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
     file_name = "Rutgers/Data/" + "data-" + timestr + ".txt"
@@ -107,12 +106,11 @@ if __name__ == "__main__":
                 vicon_data_flat = vicon_data_list
                 # vicon_data_flat = [item for x in vicon_data_list for item in x]
                     # print("VICON data:", vicon_data_flat[0:3])
-                print('Vicon received')
+            # print('Vicon received')
 
             current_freq = 1/(time.time() - time_start)
             # Run detection
-            #Timers
-  
+     
 
 
             # Data format of output is plain txt
@@ -123,11 +121,9 @@ if __name__ == "__main__":
 
             if vicon_enable:
                 data_record.extend(vicon_data_flat)
-
             data_record_list.append(data_record)
             # print(vicon_data_flat)
             file1.writelines(','.join(str(j) for j in data_record) + '\n')
-            print('Vicon written')
 
             current_frame += 1
 
