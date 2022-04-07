@@ -196,7 +196,10 @@ if __name__ == "__main__":
             IMU_data = child_conn_IMU.recv()
             # print(IMU_data)
             # print('IMU received')
-
+            i = 0
+            for x in objects:
+                x.AssignIMUData(IMU_data[i:i+7])
+                i+=9
             vicon_data_flat = []
 
             if vicon_enable:
