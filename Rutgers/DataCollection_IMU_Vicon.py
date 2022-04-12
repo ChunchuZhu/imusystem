@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
             if vicon_enable:
                 vicon_data = child_conn_vicon.recv()
-                vicon_data_list = [None] * 117 # number of markers * 3
+                vicon_data_list = [None] * 30 # number of markers * 3
                 # if vicon_data[0] is not None:
                     # print("VICON data:", vicon_data[0])
                 for i, data in enumerate(vicon_data):
@@ -214,7 +214,7 @@ if __name__ == "__main__":
                         data_list = [None] * 3
                 # vicon_data_list = [x.tolist() for x in vicon_data]
                     vicon_data_list[i*3:i*3+3] = data_list
-                assert len(vicon_data_list) == 117
+                assert len(vicon_data_list) == 30
                 vicon_data_flat = vicon_data_list
                 # vicon_data_flat = [item for x in vicon_data_list for item in x]
                     # print("VICON data:", vicon_data_flat[0:3])
@@ -247,7 +247,7 @@ if __name__ == "__main__":
             if not IMU_data:
                 IMU_data = [None] * 63
             if not vicon_data_flat:
-                vicon_data_flat = [None] * 117 # change this number to number of markers * 3
+                vicon_data_flat = [None] * 30 # change this number to number of markers * 3
 
             if vicon_enable:
                 data_record.extend(vicon_data_flat)
