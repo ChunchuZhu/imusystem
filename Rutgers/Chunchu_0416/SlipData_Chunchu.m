@@ -2,7 +2,7 @@
 % Marker Order:
 % Left foot: Heel, Toe, Side, Top
 % Right foot: Heel, Toe, Side, Top
-
+load('Chunchu_0416.mat');
 % IMU Order:
 % Trunk, Right Thigh, Left Thigh, Right Shank, Left Shank, Right Heel, 
 % Left Heel
@@ -43,8 +43,8 @@ IMU.RH = Zhu_0414_data_slip(:,82:90);
 IMU.LH = Zhu_0414_data_slip(:,91:99);
 
 pelvisAcc = IMU.TK(:,5);
-forwardFootAcc_L = IMU.LH(:,4)*cosd(IMU.LH(i,7)-IMU.LH_Z_Zeroed) + IMU.LH(:,5)*sind(IMU.LH(i,7)-IMU.LH_Z_Zeroed);
-forwardFootAcc_R = IMU.RH(:,4)*cosd(IMU.RH(i,7)-IMU.RH_Z_Zeroed) + IMU.RH(:,5)*sind(IMU.RH(i,7)-IMU.RH_Z_Zeroed);
+forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LH(:,7)-IMU.LH_Z_Zeroed) - IMU.LH(:,5).*sind(IMU.LH(:,7)-IMU.LH_Z_Zeroed);
+forwardFootAcc_R = IMU.RH(:,4).*cosd(IMU.RH(:,7)-IMU.RH_Z_Zeroed) - IMU.RH(:,5).*sind(IMU.RH(:,7)-IMU.RH_Z_Zeroed);
 a_a_l = 0;
 a_a_r = 0;
 for i =2:length(IMU.RK)
@@ -70,15 +70,15 @@ end
 
 %%  Slip indicator
 % original
-% dd_q_hh_l = (pelvisAcc - forwardFootAcc_L) / L_hh;
-% dd_q_hh_r = (pelvisAcc - forwardFootAcc_R) / L_hh;
-% slip_indicator_l = forwardFootAcc_L ./ (2.718.^ (dd_q_hh_l - 40)) / 10^17;
-% slip_indicator_r = forwardFootAcc_R ./ (2.718.^ (dd_q_hh_r - 40)) / 10^17;
+dd_q_hh_l = (pelvisAcc - forwardFootAcc_L) / L_hh;
+dd_q_hh_r = (pelvisAcc - forwardFootAcc_R) / L_hh;
+slip_indicator_l = forwardFootAcc_L ./ (2.718.^ (dd_q_hh_l - 40)) / 10^17;
+slip_indicator_r = forwardFootAcc_R ./ (2.718.^ (dd_q_hh_r - 40)) / 10^17;
 
-dd_q_hh_l = (pelvisAcc - foot_L') / L_hh;
-dd_q_hh_r = (pelvisAcc - foot_R') / L_hh;
-slip_indicator_l = foot_L' ./ (2.718.^ (dd_q_hh_l - 40)) / 10^17;
-slip_indicator_r = foot_R' ./ (2.718.^ (dd_q_hh_r - 40)) / 10^17;
+% dd_q_hh_l = (pelvisAcc - foot_L') / L_hh;
+% dd_q_hh_r = (pelvisAcc - foot_R') / L_hh;
+% slip_indicator_l = foot_L' ./ (2.718.^ (dd_q_hh_l - 40)) / 10^17;
+% slip_indicator_r = foot_R' ./ (2.718.^ (dd_q_hh_r - 40)) / 10^17;
 
 plot(ep_L)
 hold on
@@ -90,6 +90,26 @@ line([0 1.7*10^4],[-30 -30],'Color','red','LineStyle','--')
 legend("ep_L","ep_R")
 hold on
 
+
+
+%% Analyze data from 10900 - 11200
+pelvisAcc = IMU.TK(:,5);
+forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LH(:,7)-IMU.LH_Z_Zeroed) - IMU.LH(:,5).*sind(IMU.LH(:,7)-IMU.LH_Z_Zeroed);
+forwardFootAcc_R = IMU.RH(:,4).*cosd(IMU.RH(:,7)-IMU.RH_Z_Zeroed) - IMU.RH(:,5).*sind(IMU.RH(:,7)-IMU.RH_Z_Zeroed);
+% a_a_l = 0;
+% a_a_r = 0;
+for i =10900:11200
+    a_a_l(i) = (IMU.LK(i,3) - IMU.LK(i-1,3))/0.01;
+    a_a_r(i) = (IMU.RK(i,3) - IMU.RK(i-1,3))/0.01;
+    ep_L(i) = atan( (IMU.LK(i,4) + a_a_l*l) / (IMU.LK(i,5) + IMU.LK(i,3)^2*l) ) - (IMU.LK(i,7)-IMU.LK_Z_Zeroed);
+    ep_R(i) = atan( (IMU.RK(i,4) + a_a_r*l) / (IMU.LK(i,5) + IMU.RK(i,3)^2*l) ) - (IMU.RK(i,7)-IMU.RK_Z_Zeroed);
+end 
+
+figure
+plot(l_heel(10900:11200,3));
+hold on
+plot(ep_L(10900:11200));
+plot(l_gaitStage(10900:11200))
 
 % plot(forwardFootAcc_L);hold on
 % plot(forwardFootAcc_R)

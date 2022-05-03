@@ -43,8 +43,8 @@ IMU.RH = Zhu_0414_data_slip(:,82:90);
 IMU.LH = Zhu_0414_data_slip(:,91:99);
 
 pelvisAcc = IMU.TK(:,5);
-forwardFootAcc_L = IMU.LH(:,4)*cosd(IMU.LH(i,7)-IMU.LH_Z_Zeroed) + IMU.LH(:,5)*sind(IMU.LH(i,7)-IMU.LH_Z_Zeroed);
-forwardFootAcc_R = IMU.RH(:,4)*cosd(IMU.RH(i,7)-IMU.RH_Z_Zeroed) + IMU.RH(:,5)*sind(IMU.RH(i,7)-IMU.RH_Z_Zeroed);
+forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LH(:,7)-IMU.LH_Z_Zeroed) + IMU.LH(:,5)*sind(IMU.LH(:,7)-IMU.LH_Z_Zeroed);
+forwardFootAcc_R = IMU.RH(:,4).*cosd(IMU.RH(:,7)-IMU.RH_Z_Zeroed) + IMU.RH(:,5)*sind(IMU.RH(:,7)-IMU.RH_Z_Zeroed);
 a_a_l = 0;
 a_a_r = 0;
 for i =2:length(IMU.RK)
