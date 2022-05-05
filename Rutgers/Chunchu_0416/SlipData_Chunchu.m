@@ -6,12 +6,18 @@ load('Chunchu_0416.mat');
 % IMU Order:
 % Trunk, Right Thigh, Left Thigh, Right Shank, Left Shank, Right Heel, 
 % Left Heel
+IMU.TK = Zhu_0414_data_slip(:,37:45);
+IMU.RT = Zhu_0414_data_slip(:,46:54);
+IMU.LT = Zhu_0414_data_slip(:,55:63);
 IMU.RK = Zhu_0414_data_slip(:,64:72);
 IMU.LK = Zhu_0414_data_slip(:,73:81);
-IMU.RK_Z_Zeroed = mean(IMU.RK(1:100,7));
-IMU.LK_Z_Zeroed = mean(IMU.LK(1:100,7));
 IMU.RH = Zhu_0414_data_slip(:,82:90);
 IMU.LH = Zhu_0414_data_slip(:,91:99);
+
+IMU.RK_Z_Zeroed = mean(IMU.RK(1:100,7));
+IMU.LK_Z_Zeroed = mean(IMU.LK(1:100,7));
+IMU.RT_Z_Zeroed = mean(IMU.RT(1:100,7));
+IMU.LT_Z_Zeroed = mean(IMU.LT(1:100,7));
 IMU.RH_Z_Zeroed = mean(IMU.RH(1:100,7));
 IMU.LH_Z_Zeroed = mean(IMU.LH(1:100,7));
 
@@ -34,17 +40,10 @@ slipRight = Zhu_0414_data_slip(:,5);
 slipLeft = Zhu_0414_data_slip(:,6);
 
 
-IMU.TK = Zhu_0414_data_slip(:,37:45);
-IMU.RT = Zhu_0414_data_slip(:,46:54);
-IMU.LT = Zhu_0414_data_slip(:,55:63);
-IMU.RK = Zhu_0414_data_slip(:,64:72);
-IMU.LK = Zhu_0414_data_slip(:,73:81);
-IMU.RH = Zhu_0414_data_slip(:,82:90);
-IMU.LH = Zhu_0414_data_slip(:,91:99);
-
+%%
 pelvisAcc = IMU.TK(:,5);
-forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LH(:,7)-IMU.LH_Z_Zeroed) - IMU.LH(:,5).*sind(IMU.LH(:,7)-IMU.LH_Z_Zeroed);
-forwardFootAcc_R = IMU.RH(:,4).*cosd(IMU.RH(:,7)-IMU.RH_Z_Zeroed) - IMU.RH(:,5).*sind(IMU.RH(:,7)-IMU.RH_Z_Zeroed);
+forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LT(:,7) - IMU.LT_Z_Zeroed + IMU.LH(:,7)-IMU.LH_Z_Zeroed) - IMU.LH(:,5).*sind( IMU.LT(:,7) - IMU.LT_Z_Zeroed + IMU.LH(:,7)-IMU.LH_Z_Zeroed);
+forwardFootAcc_R = IMU.RH(:,4).*cosd(IMU.RT(:,7) - IMU.RT_Z_Zeroed + IMU.RH(:,7)-IMU.RH_Z_Zeroed) - IMU.RH(:,5).*sind( IMU.RT(:,7) - IMU.RT_Z_Zeroed + IMU.RH(:,7)-IMU.RH_Z_Zeroed);
 a_a_l = 0;
 a_a_r = 0;
 for i =2:length(IMU.RK)
