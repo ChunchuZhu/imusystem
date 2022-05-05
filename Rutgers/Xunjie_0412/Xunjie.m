@@ -18,7 +18,6 @@ IMU.LH_Z_Zeroed = mean(IMU.LH(1:100,7));
 l = 0.2;
 L_hh = 1;
 %% Slip detection data analysis
-% Chunchu's Data
 % Xunjie_0412_data_slip = Xunjie_0412_data_slip(8140:end,:);
 l_heel = Xunjie_0412_data_slip(:,10:12);
 l_toe = Xunjie_0412_data_slip(:,19:21);
@@ -42,6 +41,7 @@ IMU.LK = Xunjie_0412_data_slip(:,73:81);
 IMU.RH = Xunjie_0412_data_slip(:,82:90);
 IMU.LH = Xunjie_0412_data_slip(:,91:99);
 
+%%
 pelvisAcc = IMU.TK(:,5);
 forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LH(:,7)-IMU.LH_Z_Zeroed) + IMU.LH(:,5).*sind(IMU.LH(:,7)-IMU.LH_Z_Zeroed);
 forwardFootAcc_R = IMU.RH(:,4).*cosd(IMU.RH(:,7)-IMU.RH_Z_Zeroed) + IMU.RH(:,5).*sind(IMU.RH(:,7)-IMU.RH_Z_Zeroed);
