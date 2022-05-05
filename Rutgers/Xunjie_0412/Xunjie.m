@@ -41,6 +41,8 @@ IMU.LK = Xunjie_0412_data_slip(:,73:81);
 IMU.RH = Xunjie_0412_data_slip(:,82:90);
 IMU.LH = Xunjie_0412_data_slip(:,91:99);
 
+plot(IMU.TK(:,9));hold on;plot(IMU.TK(:,8));plot(IMU.TK(:,7));legend('Euler X','Euler Y','Euler Z');
+
 %%
 pelvisAcc = IMU.TK(:,5);
 forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LH(:,7)-IMU.LH_Z_Zeroed) + IMU.LH(:,5).*sind(IMU.LH(:,7)-IMU.LH_Z_Zeroed);

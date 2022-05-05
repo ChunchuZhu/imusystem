@@ -39,7 +39,8 @@ l_gaitStage = Zhu_0414_data_slip(:,4);
 slipRight = Zhu_0414_data_slip(:,5);
 slipLeft = Zhu_0414_data_slip(:,6);
 
-
+plot(IMU.TK(:,9));hold on;plot(IMU.TK(:,8));plot(IMU.TK(:,7));legend('Euler X','Euler Y','Euler Z');
+figure; plot(l_heel(:,3));hold on; plot(l_heel(:,1));
 %%
 pelvisAcc = IMU.TK(:,5);
 forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LT(:,7) - IMU.LT_Z_Zeroed + IMU.LH(:,7)-IMU.LH_Z_Zeroed) - IMU.LH(:,5).*sind( IMU.LT(:,7) - IMU.LT_Z_Zeroed + IMU.LH(:,7)-IMU.LH_Z_Zeroed);
