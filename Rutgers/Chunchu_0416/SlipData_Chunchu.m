@@ -54,7 +54,7 @@ slipRight = Zhu_0414_data_slip(:,5);
 slipLeft = Zhu_0414_data_slip(:,6);
 
 plot(IMU.TK(:,9));hold on;plot(IMU.TK(:,8));plot(IMU.TK(:,7));legend('Euler X','Euler Y','Euler Z');
-figure; plot(l_heel(:,3));hold on; plot(l_heel(:,1));
+% figure; plot(l_heel(:,3));hold on; plot(l_heel(:,1));
 %%
 % pelvisAcc = IMU.TK(:,5);
 % forwardFootAcc_L = IMU.LH(:,4).*cosd(IMU.LT(:,7) - IMU.LT_Z_Zeroed + IMU.LH(:,7)-IMU.LH_Z_Zeroed) - IMU.LH(:,5).*sind( IMU.LT(:,7) - IMU.LT_Z_Zeroed + IMU.LH(:,7)-IMU.LH_Z_Zeroed);
@@ -130,6 +130,15 @@ slip_indicator_r = forwardFootAcc_R ./ (2.718.^ (dd_q_hh_r - 40)) / 10^17;
 plot(slip_indicator_l)
 hold on;
 plot(slip_indicator_r)
+
+for i = 1:length(slip_indicator_r)
+    if (r_gaitStage(i)~=0)
+        slip_indicator_r(i) = 0;
+    end
+end
+
+
+
 % dd_q_hh_l = (pelvisAcc - foot_L') / L_hh;
 % dd_q_hh_r = (pelvisAcc - foot_R') / L_hh;
 % slip_indicator_l = foot_L' ./ (2.718.^ (dd_q_hh_l - 40)) / 10^17;

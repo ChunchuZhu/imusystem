@@ -166,7 +166,7 @@ if __name__ == "__main__":
     print('IMU Length',len(IMU_data))
     i = 0
     for x in objects:
-        x.zAngleZeroed = float(IMU_data[i+6])
+        x.yAngleZeroed = float(IMU_data[i+7])
         i+=9
 
     t_calibrate_count =0
@@ -176,12 +176,12 @@ if __name__ == "__main__":
         IMU_data = child_conn_IMU.recv()
         # Define z-zeroed angles:
         for x in objects:
-            x.yAngleZeroed = (x.yAngleZeroed + float(IMU_data[i+6]))/2
+            x.yAngleZeroed = (x.yAngleZeroed + float(IMU_data[i+7]))/2
             i+=9
         t_calibrate_count +=1
 
-    print("Right Heel Z-angle zeroed:",objRHeel.zAngleZeroed)
-    print("Left Heel Z-angle zeroed:",objLHeel.zAngleZeroed)
+    print("Right Heel Y-angle zeroed:",objRHeel.yAngleZeroed)
+    print("Left Heel Y-angle zeroed:",objLHeel.yAngleZeroed)
 
     t0 = time.time()
 
@@ -198,7 +198,7 @@ if __name__ == "__main__":
             # print('IMU received')
             i = 0
             for x in objects:
-                x.AssignIMUData(IMU_data[i:i+7])
+                x.AssignIMUData(IMU_data[i:i+8])
                 i+=9
             vicon_data_flat = []
 
@@ -231,14 +231,15 @@ if __name__ == "__main__":
             gaitDetectRight.testVal(objRThigh.gyZ, objRShank.gyZ, objRHeel.gyZ)
             gaitDetectLeft.testVal(objLThigh.gyZ, objLShank.gyZ, objLHeel.gyZ)
 
-            forwardFootAccRight = (objRHeel.acX * np.cos( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745)) - (objRHeel.acY * np.sin( (objRHeel.zAngle - objRHeel.zAngleZeroed) * .01745))
-            forwardFootAccLeft = (objLHeel.acX * np.cos( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745)) - (objLHeel.acY * np.sin( (objLHeel.zAngle - objLHeel.zAngleZeroed) * .01745))
+            forwardFootAccRight = np.absolute(objRHeel.acX * np.cos( (objRHeel.yAngle - objRHeel.yAngleZeroed) * .01745)) - np.absolute(objRHeel.acY * np.sin( (objRHeel.yAngle - objRHeel.yAngleZeroed) * .01745))
+            
+            forwardFootAccLeft = np.absolute(objLHeel.acX * np.cos( (objLHeel.yAngle - objLHeel.yAngleZeroed) * .01745)) - np.absolute(objLHeel.acY * np.sin( (objLHeel.yAngle - objLHeel.yAngleZeroed) * .01745))
             #Slip Algorithm - Calculates Slip Indicator from Trkov IFAC 2017 paper
-            slipRight = gaitDetectRight.slipTrkov(objLowBack.acX, forwardFootAccRight, hip_heel_length)
-            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acX, forwardFootAccLeft , hip_heel_length)
+            slipRight = gaitDetectRight.slipTrkov(objLowBack.acY, forwardFootAccRight, hip_heel_length)
+            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acY, forwardFootAccLeft , hip_heel_length)
 
             # Data format of output is plain txt
-            data_record = [current_frame, current_freq]
+            data_record = [current_frame, current_freq,objRHeel.yAngleZeroed, objLHeel.yAngleZeroed]
             data_record.append(gaitDetectRight.gaitStage)
             data_record.append(gaitDetectLeft.gaitStage)
             data_record.append(slipRight)
