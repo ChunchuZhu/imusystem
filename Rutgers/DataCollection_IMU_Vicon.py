@@ -176,7 +176,7 @@ if __name__ == "__main__":
         IMU_data = child_conn_IMU.recv()
         # Define z-zeroed angles:
         for x in objects:
-            x.zAngleZeroed = (x.zAngleZeroed + float(IMU_data[i+6]))/2
+            x.yAngleZeroed = (x.yAngleZeroed + float(IMU_data[i+6]))/2
             i+=9
         t_calibrate_count +=1
 
