@@ -40,12 +40,19 @@ double MaxPIDout = 10;              //Max torque control PID output (Unit Curren
 
 double theta_k_l;
 double theta_k_r;
-double k_st = 0.06; 
-double k_sw = 0.2; 
-double theta_st_l_0 = 2.33; 
+double k_st = 0.08; 
+double k_sw = 0.5; 
+double theta_st_l_0 = -2.5; 
 double theta_st_r_0 = 1.33; 
 double a = 0.099; 
-double b = 2.619;
+double b = 1;
+// original
+//double k_st = 0.06; 
+//double k_sw = 0.2; 
+//double theta_st_l_0 = 2.33; 
+//double theta_st_r_0 = 1.33; 
+//double a = 0.099; 
+//double b = 2.619;
 
 double Fsample = 500;                   // [Hz] teensy controller sample rate (Maximum frequency: 1000 Hz due to Can Bus)
 unsigned long current_time = 0;
@@ -372,8 +379,8 @@ void CurrentControl()
       theta_k_l = m1.motorAngle+9;
       theta_k_r = -m2.motorAngle+19;
       
-      torque_command_L = k_st * ( 1 - (1 / (1+ exp(-a * (( theta_k_r - theta_k_l ) -b) )))) * (theta_k_r - theta_st_l_0) + k_sw * (1 / (1+ exp(-a * ((theta_k_r - theta_k_l) -b) ))) * (theta_k_r - 57 );
-      torque_command_R = -k_st * ( 1 - (1 / (1+ exp(-a * (( theta_k_l - theta_k_r ) -b) )))) * (theta_k_l - theta_st_r_0) + k_sw * (1 / (1+ exp(-a * ((theta_k_l - theta_k_r) -b) ))) * (theta_k_l - 57 );
+      torque_command_L = k_st * ( 1 - (1 / (1+ exp(-a * (( theta_k_r - theta_k_l ) -b) )))) * (theta_k_r - theta_st_l_0) + k_sw * (1 / (1+ exp(-a * ((theta_k_r - theta_k_l) -b) ))) * (theta_k_r - 60 );
+      torque_command_R = -k_st * ( 1 - (1 / (1+ exp(-a * (( theta_k_l - theta_k_r ) -b) )))) * (theta_k_l - theta_st_r_0) + k_sw * (1 / (1+ exp(-a * ((theta_k_l - theta_k_r) -b) ))) * (theta_k_l - 60 );
       
 
       Cur_command_L = torque_command_L*3 ;
@@ -399,7 +406,7 @@ void CurrentControl()
     }
 
 
-    else if (assist_mode == 5) // impedance control for squatting
+    else if (assist_mode == 6) // impedance control for squatting
     {
       m3.read_multi_turns_angle();//read angle and angle velocity
       receive_CAN_data();
