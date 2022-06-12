@@ -28,7 +28,9 @@ IMU imu;                                //Create IMU object see WL_IMU.h
 
 
 
-int assist_mode = 5;
+int assist_mode = 1;
+
+
 
 
 
@@ -38,14 +40,22 @@ double Igain = 0.7;                 //I gain of torque control
 double Dgain = 0;                   //D gain of torque control
 double MaxPIDout = 10;              //Max torque control PID output (Unit Current A, inner loop is current controller)
 
+//double theta_k_l;
+//double theta_k_r;
+//double k_st = 0.06; 
+//double k_sw = 0.2; 
+//double theta_st_l_0 = 2.33; 
+//double theta_st_r_0 = 1.33; 
+//double a = 0.099; 
+//double b = 2.619;
 double theta_k_l;
 double theta_k_r;
 double k_st = 0.06; 
-double k_sw = 0.2; 
-double theta_st_l_0 = 2.33; 
-double theta_st_r_0 = 1.33; 
+double k_sw = 0.05; 
+double theta_st_l_0 = 5; 
+double theta_st_r_0 = 5; 
 double a = 0.099; 
-double b = 2.619;
+double b = 1.619;
 
 double Fsample = 500;                   // [Hz] teensy controller sample rate (Maximum frequency: 1000 Hz due to Can Bus)
 unsigned long current_time = 0;

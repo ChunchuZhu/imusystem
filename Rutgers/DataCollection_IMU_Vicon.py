@@ -131,7 +131,7 @@ if __name__ == "__main__":
         sender_vicon.start()
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    file_name = "Rutgers/Data/" + "data-" + timestr + ".txt"
+    file_name = "data-" + timestr + ".txt"
     file1 = open(file_name, "w")
 
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     header += f"\n"
     file1.write(header)
 
-    #  Zero z_angles
+    #  Zero y_angles
     IMU_data = child_conn_IMU.recv()
     print('IMU Length',len(IMU_data))
     i = 0
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
             if vicon_enable:
                 vicon_data = child_conn_vicon.recv()
-                vicon_data_list = [None] * 30 # number of markers * 3
+                vicon_data_list = [None] * 54 # number of markers * 3
                 # if vicon_data[0] is not None:
                     # print("VICON data:", vicon_data[0])
                 for i, data in enumerate(vicon_data):
@@ -214,7 +214,7 @@ if __name__ == "__main__":
                         data_list = [None] * 3
                 # vicon_data_list = [x.tolist() for x in vicon_data]
                     vicon_data_list[i*3:i*3+3] = data_list
-                assert len(vicon_data_list) == 30
+                assert len(vicon_data_list) ==54
                 vicon_data_flat = vicon_data_list
                 # vicon_data_flat = [item for x in vicon_data_list for item in x]
                     # print("VICON data:", vicon_data_flat[0:3])

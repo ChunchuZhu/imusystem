@@ -24,8 +24,8 @@ def receive_from_IMU(serial_conn):
             # can't be performed
             time.sleep(.001)                # delay of 1ms 
             temp = serial_conn.readline()   # check for serial output.
-            if len(dataPacket) < 18:
-                dataPacket = [dataPacket, temp]
+            while len(dataPacket) != 63:
+                dataPacket = serial_conn.readline()
         dataPacket=str(dataPacket,'utf-8')
         splitPacket=dataPacket.split(',')
         print(splitPacket)

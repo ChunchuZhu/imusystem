@@ -4,7 +4,7 @@ import struct
 import numpy as np
 
 # serialPort = '/dev/cu.usbmodem102558701'
-serialPort = '/dev/cu.usbmodem84041401'
+serialPort = '/dev/ttyACM0'
 serialBaud = 115200
 # Connect to serial port
 print('Trying to connect to ' + str(serialPort) +
@@ -17,7 +17,7 @@ except:
             ' at ' + str(serialBaud) + ' BAUD.')
 
 timestr = time.strftime("%Y%m%d-%H%M%S")
-file_name = "/Users/chunchu/My Drive/[3] Rutgers/[1] Research/[2] On-going Project/[3] Slip Recovery/TeensyControlCodes/ImpedanceTestNewerVersion/data-" + timestr + ".txt"
+file_name = "data_XSB" + timestr + ".txt"
 file1 = open(file_name, "w")
 
 try:
