@@ -289,4 +289,4 @@ class sensorObject:
         
         self.xAngle = float(splitPacket[6])
         self.yAngle = float(splitPacket[7])
-        self.zAngle = float(splitPacket[8])
+        # self.zAngle = float(splitPacket[8])
