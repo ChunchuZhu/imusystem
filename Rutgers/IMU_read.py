@@ -15,7 +15,6 @@ time_list = []
 
 def receive_from_IMU(serial_conn):
     try:
-        time_start = time.time()
         dataPacket=serial_conn.readline()
         while not '\\n'in str(dataPacket):         # check if full data is received. 
             # This loop is entered only if serial read value doesn't contain \n
@@ -24,12 +23,11 @@ def receive_from_IMU(serial_conn):
             # can't be performed
             time.sleep(.001)                # delay of 1ms 
             temp = serial_conn.readline()   # check for serial output.
-            while len(dataPacket) != 63:
+            while len(temp) != 63:
                 dataPacket = serial_conn.readline()
         dataPacket=str(dataPacket,'utf-8')
         splitPacket=dataPacket.split(',')
         print(splitPacket)
-        freq = 1/(time.time()-time_start)
 
     except KeyboardInterrupt:
 

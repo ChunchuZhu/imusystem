@@ -174,7 +174,7 @@ if __name__ == "__main__":
         i = 0
         #  read data
         IMU_data = child_conn_IMU.recv()
-        # Define z-zeroed angles:
+        # Define z-zeroed a<c4ab9d93-4a24-47a9-baf3-026953597a0b@Spark>ngles:
         for x in objects:
             x.yAngleZeroed = (x.yAngleZeroed + float(IMU_data[i+7]))/2
             i+=9
@@ -200,8 +200,8 @@ if __name__ == "__main__":
             for x in objects:
                 x.AssignIMUData(IMU_data[i:i+8])
                 i+=9
-            vicon_data_flat = []
 
+            vicon_data_flat = []
             if vicon_enable:
                 vicon_data = child_conn_vicon.recv()
                 vicon_data_list = [None] * 54 # number of markers * 3
@@ -220,13 +220,7 @@ if __name__ == "__main__":
                     # print("VICON data:", vicon_data_flat[0:3])
             # print('Vicon received')
 
-            current_freq = 1/(time.time() - time_start)
             # Run detection
-            #Timers
-            timeLastRun = timeCurrent
-            timeCurrent = time.time()
-            timeToRun = timeCurrent - timeLastRun
-
             #Right and Left Gait Detection
             gaitDetectRight.testVal(objRThigh.gyZ, objRShank.gyZ, objRHeel.gyZ)
             gaitDetectLeft.testVal(objLThigh.gyZ, objLShank.gyZ, objLHeel.gyZ)
@@ -237,18 +231,24 @@ if __name__ == "__main__":
             #Slip Algorithm - Calculates Slip Indicator from Trkov IFAC 2017 paper
             slipRight = gaitDetectRight.slipTrkov(objLowBack.acY, forwardFootAccRight, hip_heel_length)
             slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acY, forwardFootAccLeft , hip_heel_length)
+            
+            current_freq = 1/(time.time() - time_start)
+            #Timers
+            timeLastRun = timeCurrent
+            timeCurrent = time.time()
+            timeToRun = timeCurrent - timeLastRun
 
             # Data format of output is plain txt
-            data_record = [current_frame, current_freq,objRHeel.yAngleZeroed, objLHeel.yAngleZeroed]
+            data_record = [current_frame, current_freq, objRHeel.yAngleZeroed, objLHeel.yAngleZeroed]
             data_record.append(gaitDetectRight.gaitStage)
             data_record.append(gaitDetectLeft.gaitStage)
             data_record.append(slipRight)
-            data_record.append(slipRight)
+            data_record.append(slipLeft)
 
             if not IMU_data:
                 IMU_data = [None] * 63
             if not vicon_data_flat:
-                vicon_data_flat = [None] * 30 # change this number to number of markers * 3
+                vicon_data_flat = [None] * 54 # change this number to number of markers * 3
 
             if vicon_enable:
                 data_record.extend(vicon_data_flat)
@@ -260,6 +260,8 @@ if __name__ == "__main__":
                 if IMU_data[0]:
                     print("IMU only" )
             data_record_list.append(data_record)
+            
+            
             # print(vicon_data_flat)
             file1.writelines(','.join(str(j) for j in data_record) + '\n')
 

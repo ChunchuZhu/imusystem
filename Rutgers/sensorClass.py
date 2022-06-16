@@ -287,5 +287,6 @@ class sensorObject:
         self.acY = float(splitPacket[4])
         self.acZ = float(splitPacket[5])
         
+        self.xAngle = float(splitPacket[6])
         self.yAngle = float(splitPacket[7])
-        
+        self.zAngle = float(splitPacket[8])
