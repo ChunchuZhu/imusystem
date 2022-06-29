@@ -80,6 +80,7 @@ if __name__ == "__main__":
     gaitDetectRight = gaitDetect()
     gaitDetectLeft = gaitDetect()
     
+
     #Create lists that can be cycled through to iterate over every object for exporting (and creating the dump file data header).
     objects = []
     stringObjects = []
@@ -193,6 +194,7 @@ if __name__ == "__main__":
             # Range of measurement: x, y, z as follows; x+ facing left, y+ facing up, z+ facing forward
             # https://lp-research.atlassian.net/wiki/spaces/LKB/pages/1100611599/LPMS+User+Manual
             
+
             IMU_data = child_conn_IMU.recv()
             # print(IMU_data)
             # print('IMU received')
