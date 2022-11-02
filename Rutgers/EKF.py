@@ -41,12 +41,6 @@ delta_T = 0.01
 #                         [  0,1.0,   0],
 #                         [  0,  0, 1.0]])
 
-F_theta = np.array([ [0,1,0,0],
-                    [ 0 ,0, ( (M1*a1 + M2*L2)*(np.cos(q1)*dq1*dq1 + ddq1*np.sin(q1))/(M1+M2)), ((M2*L2)(np.cos(q2)*dq2*dq2 + ddq2*np.sin(q2))/(M1+M2))],
-                    [0,0,1,0],
-                    [0,0,0,1]])
-
-F = np.eye(4) + delta_T * F_theta
 # Noise applied to the forward kinematics (calculation
 # of the estimated state at time k from the state
 # transition model of the mobile robot). This is a vector

@@ -40,6 +40,9 @@ class sensorObject:
 
         self.zAngle = 0
         self.zAngleZeroed = 0
+        
+        self.yAngle = 0
+        self.yAngleZeroed = 0
 
         self.xAngle = 0
         self.xAngleZeroed = 0

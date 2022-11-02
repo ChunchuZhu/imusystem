@@ -185,6 +185,10 @@ if __name__ == "__main__":
     print("Left Heel Y-angle zeroed:",objLHeel.yAngleZeroed)
 
     t0 = time.time()
+    q1_x_1 = objRThigh.yAngle
+    q2_x_1 = objRShank.yAngle
+    dq1_x_1 = objRThigh.gyZ
+    dq2_x_1 = objRShank.gyZ
 
     try:
         while True:
@@ -193,7 +197,7 @@ if __name__ == "__main__":
             # Data: Periods, angles, angle velocities, quaternion
             # Range of measurement: x, y, z as follows; x+ facing left, y+ facing up, z+ facing forward
             # https://lp-research.atlassian.net/wiki/spaces/LKB/pages/1100611599/LPMS+User+Manual
-            
+
 
             IMU_data = child_conn_IMU.recv()
             # print(IMU_data)
@@ -202,6 +206,17 @@ if __name__ == "__main__":
             for x in objects:
                 x.AssignIMUData(IMU_data[i:i+8])
                 i+=9
+            q1 = objRThigh.yAngle
+            q2 = objRShank.yAngle
+            dq1 = objRThigh.gyZ
+            dq2 = objRThigh.gyZ
+            ddq1 = (dq1 - dq1_x_1)/0.01
+            ddq2 = (dq2 - dq2_x_1)/0.01
+
+            q1_x_1 = q1
+            q2_x_1 = q2
+            dq1_x_1 = dq1
+            dq2_x_1 = dq2
 
             vicon_data_flat = []
             if vicon_enable:
@@ -233,13 +248,36 @@ if __name__ == "__main__":
             #Slip Algorithm - Calculates Slip Indicator from Trkov IFAC 2017 paper
             slipRight = gaitDetectRight.slipTrkov(objLowBack.acY, forwardFootAccRight, hip_heel_length)
             slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acY, forwardFootAccLeft , hip_heel_length)
+
+            if slipRight > 1000000:
+                counter = 0
+                state_estimate_k_minus_1 = np.array([0.1,0.5,objRThigh.gyZ-objRThigh.yAngleZeroed,objRShank.gyZ-objLShank.yAngleZeroed])
+                P_k_minus_1 = 0*np.eyes(4)
+
+                obs_vector_z_k = 0
+                # aHeelX_SS_IMU_EKF(:,1)=SS_AccX_RH_offset_100Hz(1+IMUoffsetSS:stop1+IMUoffsetSS,1); %Can try Global, but first try Local since it does not seems to be too different
+
+                # % clear vHeelX_Kin_Diference
+                # vHeelX_Kin_Diference=zeros(stop1-IMUoffsetSS+IMUoffsetSS,1)+0;
+
+
+                # % Output eqn: Y are measured values
+                # Y=[aHeelX_SS_IMU_EKF vHeelX_Kin_Diference]; %MT     %Note: variables aHeelX_SS_IMU_EKF and vHeelX_Kin_Diference has to be same size/length
+                while counter < 1000:
+                    optimal_state_estimate_k, covariance_estimate_k = gaitDetectRight.ekf(obs_vector_z_k, state_estimate_k_minus_1, P_k_minus_1,q1,dq1,ddq1,q2,dq2,ddq2) 
+                    counter = counter + 1
+
             
+            
+            
+            
+
             current_freq = 1/(time.time() - time_start)
             #Timers
             timeLastRun = timeCurrent
             timeCurrent = time.time()
             timeToRun = timeCurrent - timeLastRun
-
+            
             # Data format of output is plain txt
             data_record = [current_frame, current_freq, objRHeel.yAngleZeroed, objLHeel.yAngleZeroed]
             data_record.append(gaitDetectRight.gaitStage)

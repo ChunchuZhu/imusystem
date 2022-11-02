@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import numpy as np
 class gaitDetect:
     def __init__(self):
         self.firstVar = 0
@@ -34,11 +34,27 @@ class gaitDetect:
         self.indicatorThreshold = 10 ** 30
         self.isSlipping = False
         self.timeSlipStart = 0
-        
+        self.ankH = 100
+        self.g    = 9.81
+        self.Lt = 0.4467133
+        self.Ls = 0.4821936
+        self.L1   = 0.4821936 
+        self.L1   = 0.4821936+100/1000
+        self.L2   = 0.4467133
+        self.Mb  = 30*2
+        self.Mt    = 7.3
+        self.Ms    = 3.3
+        self.Mf    = 1.0
+        self.M1   = 3.3+1;   
+        self.M2   = 60+7.3*2+3.3+1
+        self.ct = 0.19186
+        self.cs = 0.19367
+        self.a1   = 0.4821936-0.19367+100/1000
+        self.a2   = 0.4467133
+
                 
     def testVal(self, thigh, shank, heel):
         import time
-        import numpy as np
         self.movingArrThigh.append(thigh)
         self.movingArrShank.append(shank)
         self.movingArrHeel.append(heel)
@@ -107,4 +123,73 @@ class gaitDetect:
         else:
             return 0
 
+    def ekf(self, state_estimate_k_minus_1, P_k_minus_1, q1,dq1,ddq1,q2,dq2,ddq2):
+
+        ddxs = (np.sin(q1)*(self.M1*self.a1 + self.L1*self.M2)*dq1^2 + self.M2*self.a2*np.sin(q2)*dq2^2 - ddq1*np.cos(q1)*(self.M1*self.a1 + self.L1*self.M2) - self.M2*self.a2*ddq2*np.cos(q2))/(self.M1 + self.M2);
+
+        F_theta = np.array([ [0,1,0,0],
+                    [ 0 ,0, ( (self.M1*self.a1 + self.M2*self.L2)*(np.cos(q1)*dq1*dq1 + ddq1*np.sin(q1))/(self.M1+self.M2)), ((self.M2*self.L2)(np.cos(q2)*dq2*dq2 + ddq2*np.sin(q2))/(self.M1+self.M2))],
+                    [0,0,1,0],
+                    [0,0,0,1]])
+
+        F = np.eye(4) + 0.01 * F_theta
+
+        state_estimate_k = state_estimate_k_minus_1+0.01* np.array([state_estimate_k_minus_1[1],ddxs, q1,q2])
+
+        Q_k = np.array([[0.0001,   0,   0,    0],
+                        [  0,     10,   0,   0],
+                        [  0,      0, 0.1, 0],
+                        [  0,   0,      0, 0.01]])
+                         
+# Sensor measurement noise covariance matrix R_k
+# Has the same number of rows and columns as sensor measurements.
+# If we are sure about the measurements, R will be near zero.
+        R_k = np.array([[250000,   0],
+                        [  0,     50]])  
+                                        
+                          
+            # Predict the state covariance estimate based on the previous
+            # covariance and some noise
+        P_k = F @ P_k_minus_1 @ F.T + (
+                Q_k)
+
+        H_k =   np.array( [[0,0,(self.M1*self.a1+self.M2*self.L2)/(self.M1+self.M2)*(np.cos(q1)*dq1^2+ddq1*np.sin(q1)),(self.M2*self.L2)/(self.M1+self.M2)*(np.cos(q2)*dq2^2+ddq2*np.sin(q2))],[ 0 ,-1, self.L1*dq1*np.sin(q1),  self.L2*dq2*np.sin(q2)] ])
+        ################### Update (Correct) ##########################
+        # Calculate the difference between the actual sensor measurements
+        # at time k minus what the measurement model predicted 
+        # the sensor measurements would be for the current timestep k.
+        
+        
+        # ddxS_IMUHeel = (sin(q1)*(M1*a1 + L1*M2)*dq1^2 + M2*a2*sin(q2)*dq2^2 + Ft - ddq1*cos(q1)*(M1*a1 + L1*M2) - M2*a2*ddq2*cos(q2))/(M1 + M2);
+
+        # dxS_Kin = dxHip - L1*dq1*cos(q1) - L2*dq2*cos(q2) - dxS;
+
+
+        measurement_residual_y_k = obs_vector_z_k - [ddxS_IMUHeel; dxS_Kin]
+
+
+        # S=H*Pkk_1*H'+R; 
+        # K=Pkk_1*H'/S;        %for testing K=zeros(4,2);
+        
+        # Xkk=Xkk_1+K*Yhat;
+        # Pkk=(eye(4)-K*H)*Pkk_1; %MT        
+        # # Calculate the measurement residual covariance
+        # S_k = H_k @ P_k @ H_k.T + R_k
+                
+        # # Calculate the near-optimal Kalman gain
+        # # We use pseudoinverse since some of the matrices might be
+        # # non-square or singular.
+        # K_k = P_k @ H_k.T @ np.linalg.pinv(S_k)
+            
+        # # Calculate an updated state estimate for time k
+        # state_estimate_k = state_estimate_k + (K_k @ measurement_residual_y_k)
+        
+        # # Update the state covariance estimate for time k
+        # P_k = P_k - (K_k @ H_k @ P_k)
+        
+        # Print the best (near-optimal) estimate of the current state of the robot
+    
+        # Return the updated state and covariance estimates
+        return state_estimate_k, P_k
+            
         
