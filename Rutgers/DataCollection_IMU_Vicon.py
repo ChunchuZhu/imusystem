@@ -85,6 +85,9 @@ if __name__ == "__main__":
     objects = []
     stringObjects = []
     
+    slip_flag = 0
+    P_k = 0*np.eyes(4)
+    
     if toggleFlagDict['lowBack'] == True:
         objects.append(objLowBack)
         stringObjects.append("LowBack")  
@@ -239,38 +242,38 @@ if __name__ == "__main__":
 
             # Run detection
             #Right and Left Gait Detection
-            gaitDetectRight.testVal(objRThigh.gyZ, objRShank.gyZ, objRHeel.gyZ)
-            gaitDetectLeft.testVal(objLThigh.gyZ, objLShank.gyZ, objLHeel.gyZ)
+            # 20221102 Chunchu edited from gyZ -> gyY
+            gaitDetectRight.testVal(objRThigh.gyY, objRShank.gyY, objRHeel.gyY)
+            gaitDetectLeft.testVal(objLThigh.gyY, objLShank.gyY, objLHeel.gyY)
 
-            forwardFootAccRight = np.absolute(objRHeel.acX * np.cos( (objRHeel.yAngle - objRHeel.yAngleZeroed) * .01745)) - np.absolute(objRHeel.acY * np.sin( (objRHeel.yAngle - objRHeel.yAngleZeroed) * .01745))
+            forwardFootAccRight = np.absolute(objRHeel.acX * np.cos( (objRHeel.yAngle - objRHeel.yAngleZeroed) * .01745)) - np.absolute(objRHeel.acZ * np.sin( (objRHeel.yAngle - objRHeel.yAngleZeroed) * .01745))
             
-            forwardFootAccLeft = np.absolute(objLHeel.acX * np.cos( (objLHeel.yAngle - objLHeel.yAngleZeroed) * .01745)) - np.absolute(objLHeel.acY * np.sin( (objLHeel.yAngle - objLHeel.yAngleZeroed) * .01745))
+            forwardFootAccLeft = np.absolute(objLHeel.acX * np.cos( (objLHeel.yAngle - objLHeel.yAngleZeroed) * .01745)) - np.absolute(objLHeel.acZ * np.sin( (objLHeel.yAngle - objLHeel.yAngleZeroed) * .01745))
             #Slip Algorithm - Calculates Slip Indicator from Trkov IFAC 2017 paper
-            slipRight = gaitDetectRight.slipTrkov(objLowBack.acY, forwardFootAccRight, hip_heel_length)
-            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acY, forwardFootAccLeft , hip_heel_length)
-
-            if slipRight > 1000000:
-                counter = 0
-                state_estimate_k_minus_1 = np.array([0.1,0.5,objRThigh.gyZ-objRThigh.yAngleZeroed,objRShank.gyZ-objLShank.yAngleZeroed])
-                P_k_minus_1 = 0*np.eyes(4)
-
-                obs_vector_z_k = 0
-                # aHeelX_SS_IMU_EKF(:,1)=SS_AccX_RH_offset_100Hz(1+IMUoffsetSS:stop1+IMUoffsetSS,1); %Can try Global, but first try Local since it does not seems to be too different
-
-                # % clear vHeelX_Kin_Diference
-                # vHeelX_Kin_Diference=zeros(stop1-IMUoffsetSS+IMUoffsetSS,1)+0;
-
-
-                # % Output eqn: Y are measured values
-                # Y=[aHeelX_SS_IMU_EKF vHeelX_Kin_Diference]; %MT     %Note: variables aHeelX_SS_IMU_EKF and vHeelX_Kin_Diference has to be same size/length
-                while counter < 1000:
-                    optimal_state_estimate_k, covariance_estimate_k = gaitDetectRight.ekf(obs_vector_z_k, state_estimate_k_minus_1, P_k_minus_1,q1,dq1,ddq1,q2,dq2,ddq2) 
-                    counter = counter + 1
+            slipRight = gaitDetectRight.slipTrkov(objLowBack.acZ, forwardFootAccRight, hip_heel_length)
+            slipLeft = gaitDetectLeft.slipTrkov(objLowBack.acZ, forwardFootAccLeft , hip_heel_length)
 
             
+            # aHeelX_SS_IMU_EKF(:,1)=SS_AccX_RH_offset_100Hz(1+IMUoffsetSS:stop1+IMUoffsetSS,1); %Can try Global, but first try Local since it does not seems to be too different
+
+            # % clear vHeelX_Kin_Diference
+            # vHeelX_Kin_Diference=zeros(stop1-IMUoffsetSS+IMUoffsetSS,1)+0;
+
+
+            # % Output eqn: Y are measured values
+            # Y=[aHeelX_SS_IMU_EKF vHeelX_Kin_Diference]; %MT     %Note: variables aHeelX_SS_IMU_EKF and vHeelX_Kin_Diference has to be same size/length
+            if slipRight > 100000:
+                slip_flag = 1
+            else:
+                slip_flag = 0
             
-            
-            
+            if slip_flag == 1:
+                state_estimate_k_minus_1 = np.array([0.1,0.5,objRThigh.yAngle-objRThigh.yAngleZeroed,objRShank.yAngle-objLShank.yAngleZeroed])
+                P_k_minus_1 = P_k
+                obs_vector_z_k = np.array([0], [0])
+
+                state_estimate_k, P_k = gaitDetectRight.ekf(obs_vector_z_k, state_estimate_k_minus_1, P_k_minus_1,q1,dq1,ddq1,q2,dq2,ddq2)                 
+                    
 
             current_freq = 1/(time.time() - time_start)
             #Timers
@@ -284,6 +287,8 @@ if __name__ == "__main__":
             data_record.append(gaitDetectLeft.gaitStage)
             data_record.append(slipRight)
             data_record.append(slipLeft)
+            data_record.append(state_estimate_k[0])
+            data_record.append(state_estimate_k[1])
 
             if not IMU_data:
                 IMU_data = [None] * 63
