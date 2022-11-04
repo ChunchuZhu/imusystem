@@ -262,17 +262,17 @@ if __name__ == "__main__":
 
             # % Output eqn: Y are measured values
             # Y=[aHeelX_SS_IMU_EKF vHeelX_Kin_Diference]; %MT     %Note: variables aHeelX_SS_IMU_EKF and vHeelX_Kin_Diference has to be same size/length
-            if slipRight > 100000:
-                slip_flag = 1
-            else:
-                slip_flag = 0
+            # if slipRight > 100000:
+            #     slip_flag = 1
+            # else:
+            #     slip_flag = 0
             
-            if slip_flag == 1:
-                state_estimate_k_minus_1 = np.array([0.1,0.5,objRThigh.yAngle-objRThigh.yAngleZeroed,objRShank.yAngle-objLShank.yAngleZeroed])
-                P_k_minus_1 = P_k
-                obs_vector_z_k = np.array([0], [0])
+            # if slip_flag == 1:
+            #     state_estimate_k_minus_1 = np.array([0.1,0.5,objRThigh.yAngle-objRThigh.yAngleZeroed,objRShank.yAngle-objLShank.yAngleZeroed])
+            #     P_k_minus_1 = P_k
+            #     obs_vector_z_k = np.array([0], [0])
 
-                state_estimate_k, P_k = gaitDetectRight.ekf(obs_vector_z_k, state_estimate_k_minus_1, P_k_minus_1,q1,dq1,ddq1,q2,dq2,ddq2)                 
+            #     state_estimate_k, P_k = gaitDetectRight.ekf(obs_vector_z_k, state_estimate_k_minus_1, P_k_minus_1,q1,dq1,ddq1,q2,dq2,ddq2)                 
                     
 
             current_freq = 1/(time.time() - time_start)

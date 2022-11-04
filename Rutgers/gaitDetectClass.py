@@ -122,58 +122,58 @@ class gaitDetect:
             return slip_indicator
         else:
             return 0
+    
+#     def ekf(self, obs_vector_z_k ,state_estimate_k_minus_1, P_k_minus_1, q1,dq1,ddq1,q2,dq2,ddq2):
 
-    def ekf(self, obs_vector_z_k ,state_estimate_k_minus_1, P_k_minus_1, q1,dq1,ddq1,q2,dq2,ddq2):
+#         ddxs = (np.sin(q1)*(self.M1*self.a1 + self.L1*self.M2)*dq1^2 + self.M2*self.a2*np.sin(q2)*dq2^2 - ddq1*np.cos(q1)*(self.M1*self.a1 + self.L1*self.M2) - self.M2*self.a2*ddq2*np.cos(q2))/(self.M1 + self.M2);
 
-        ddxs = (np.sin(q1)*(self.M1*self.a1 + self.L1*self.M2)*dq1^2 + self.M2*self.a2*np.sin(q2)*dq2^2 - ddq1*np.cos(q1)*(self.M1*self.a1 + self.L1*self.M2) - self.M2*self.a2*ddq2*np.cos(q2))/(self.M1 + self.M2);
+#         F_theta = np.array([ [0,1,0,0],
+#                     [ 0 ,0, ( (self.M1*self.a1 + self.M2*self.L2)*(np.cos(q1)*dq1*dq1 + ddq1*np.sin(q1))/(self.M1+self.M2)), ((self.M2*self.L2)(np.cos(q2)*dq2*dq2 + ddq2*np.sin(q2))/(self.M1+self.M2))],
+#                     [0,0,1,0],
+#                     [0,0,0,1]])
 
-        F_theta = np.array([ [0,1,0,0],
-                    [ 0 ,0, ( (self.M1*self.a1 + self.M2*self.L2)*(np.cos(q1)*dq1*dq1 + ddq1*np.sin(q1))/(self.M1+self.M2)), ((self.M2*self.L2)(np.cos(q2)*dq2*dq2 + ddq2*np.sin(q2))/(self.M1+self.M2))],
-                    [0,0,1,0],
-                    [0,0,0,1]])
+#         F = np.eye(4) + 0.01 * F_theta
 
-        F = np.eye(4) + 0.01 * F_theta
+#         state_estimate_k = state_estimate_k_minus_1+0.01* np.array([state_estimate_k_minus_1[1],ddxs, q1,q2])
 
-        state_estimate_k = state_estimate_k_minus_1+0.01* np.array([state_estimate_k_minus_1[1],ddxs, q1,q2])
-
-        Q_k = np.array([[0.0001,   0,   0,    0],
-                        [  0,     10,   0,   0],
-                        [  0,      0, 0.1, 0],
-                        [  0,   0,      0, 0.01]])
+#         Q_k = np.array([[0.0001,   0,   0,    0],
+#                         [  0,     10,   0,   0],
+#                         [  0,      0, 0.1, 0],
+#                         [  0,   0,      0, 0.01]])
                          
-# Sensor measurement noise covariance matrix R_k
-# Has the same number of rows and columns as sensor measurements.
-# If we are sure about the measurements, R will be near zero.
-        R_k = np.array([[250000,   0],
-                        [  0,     50]])  
+# # Sensor measurement noise covariance matrix R_k
+# # Has the same number of rows and columns as sensor measurements.
+# # If we are sure about the measurements, R will be near zero.
+#         R_k = np.array([[250000,   0],
+#                         [  0,     50]])  
                                         
                           
-            # Predict the state covariance estimate based on the previous
-            # covariance and some noise
-        P_k = F @ P_k_minus_1 @ F.T + (
-                Q_k)
+#             # Predict the state covariance estimate based on the previous
+#             # covariance and some noise
+#         P_k = F @ P_k_minus_1 @ F.T + (
+#                 Q_k)
 
-        H_k =   np.array( [[0,0,(self.M1*self.a1+self.M2*self.L2)/(self.M1+self.M2)*(np.cos(q1* .01745)*dq1^2+ddq1*np.sin(q1* .01745)),(self.M2*self.L2)/(self.M1+self.M2)*(np.cos(q2* .01745)*dq2^2+ddq2*np.sin(q2* .01745))],[ 0 ,-1, self.L1*dq1*np.sin(q1* .01745),  self.L2*dq2*np.sin(q2* .01745)] ])
-        ################### Update (Correct) ##########################
-        # Calculate the difference between the actual sensor measurements
-        # at time k minus what the measurement model predicted 
-        # the sensor measurements would be for the current timestep k.
+#         H_k =   np.array( [[0,0,(self.M1*self.a1+self.M2*self.L2)/(self.M1+self.M2)*(np.cos(q1* .01745)*dq1^2+ddq1*np.sin(q1* .01745)),(self.M2*self.L2)/(self.M1+self.M2)*(np.cos(q2* .01745)*dq2^2+ddq2*np.sin(q2* .01745))],[ 0 ,-1, self.L1*dq1*np.sin(q1* .01745),  self.L2*dq2*np.sin(q2* .01745)] ])
+#         ################### Update (Correct) ##########################
+#         # Calculate the difference between the actual sensor measurements
+#         # at time k minus what the measurement model predicted 
+#         # the sensor measurements would be for the current timestep k.
         
-        ddxS_IMUHeel = (np.sin(q1* .01745)*(self.M1*self.a1 + self.L1*self.M2)*dq1^2 + self.M2*self.a2*np.sin(q2* .01745)*dq2^2 - ddq1*np.cos(q1* .01745)*(self.M1*self.a1 + self.L1*self.M2) - self.M2*self.a2*ddq2*np.cos(q2* .01745))/(self.M1 + self.M2)
+#         ddxS_IMUHeel = (np.sin(q1* .01745)*(self.M1*self.a1 + self.L1*self.M2)*dq1^2 + self.M2*self.a2*np.sin(q2* .01745)*dq2^2 - ddq1*np.cos(q1* .01745)*(self.M1*self.a1 + self.L1*self.M2) - self.M2*self.a2*ddq2*np.cos(q2* .01745))/(self.M1 + self.M2)
 
-        dxS_Kin = state_estimate_k[1] - self.L1*dq1*np.cos(q1* .01745) - self.L2*dq2*np.cos(q2* .01745) - state_estimate_k_minus_1[1]
-
-
-        measurement_residual_y_k = obs_vector_z_k - np.array([ddxS_IMUHeel], [dxS_Kin])
+#         dxS_Kin = state_estimate_k[1] - self.L1*dq1*np.cos(q1* .01745) - self.L2*dq2*np.cos(q2* .01745) - state_estimate_k_minus_1[1]
 
 
-        S=H_k @ P_k @ H_k.T + R_k
-        K=P_k @ H_k.T /S
+#         measurement_residual_y_k = obs_vector_z_k - np.array([ddxS_IMUHeel], [dxS_Kin])
+
+
+#         S=H_k @ P_k @ H_k.T + R_k
+#         K=P_k @ H_k.T /S
         
-        state_estimate_k=state_estimate_k+K @ measurement_residual_y_k
-        P_k = (np.eye(4)-K@H_k)*P_k
-        # Calculate the measurement residual covariance
-        S_k = H_k @ P_k @ H_k.T + R_k
+#         state_estimate_k=state_estimate_k+K @ measurement_residual_y_k
+#         P_k = (np.eye(4)-K@H_k)*P_k
+#         # Calculate the measurement residual covariance
+#         S_k = H_k @ P_k @ H_k.T + R_k
                 
         # # Calculate the near-optimal Kalman gain
         # # We use pseudoinverse since some of the matrices might be
