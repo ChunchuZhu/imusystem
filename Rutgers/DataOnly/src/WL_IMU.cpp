@@ -1,9 +1,11 @@
 #include "WL_IMU.h"
+
 union u_tag {
   byte b[4];
   float fval;
 } u;
 float IMUdata[98] = {0};
+volatile bool read_suc_flag = false;
 int iiii=0;
 void IMU::Packet_Decode(uint8_t c)
 {
@@ -12,6 +14,7 @@ void IMU::Packet_Decode(uint8_t c)
     case 0: //Read 1st Byte
       if (c == 0x3a)
       {
+        read_suc_flag = true;
         st = 1;
         Datain[read_count] = c;
         read_count += 1;
@@ -101,6 +104,8 @@ void IMU::GetData()
 void IMU::processData()
 {
   GetData();
+  if(read_suc_flag){
+    read_suc_flag = false;
   // Trunk
   TKAVx = IMUdata[1];
   TKAVy = IMUdata[2];
@@ -183,7 +188,7 @@ void IMU::processData()
   Serial.print(",");
   Serial.print(TKLAy);
   Serial.print(",");
-  Serial.print(TKLAz);
+  Serial.print(TKLAz);   
   Serial.print(",");
   Serial.print(TKEulerx);
   Serial.print(",");
@@ -191,6 +196,9 @@ void IMU::processData()
   Serial.print(",");
   Serial.print(TKEulerz);
   Serial.print(",");
+ 
+//  delay(100);
+//  Serial.print(",");
   Serial.print(RTAVx);
   Serial.print(",");
   Serial.print(RTAVy);
@@ -298,4 +306,6 @@ void IMU::processData()
   Serial.print(LHEulery);
   Serial.print(",");
   Serial.println(LHEulerz);
+  }
+  
 }

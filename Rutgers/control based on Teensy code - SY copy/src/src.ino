@@ -85,7 +85,7 @@ void IMUCurrentControl()
 {
   ////******IMU+Current Control Example Torque Constant 0.6 Nm/A**********////////
   imu.READ();   //Check if IMU data available and read it. the sample rate is 200 hz
-//  imu.processData();
+  imu.processData();
   current_time = micros();    //query current time (microsencond)
 
   if (current_time - previous_time_ble > Tinterval_ble_microsecond)
