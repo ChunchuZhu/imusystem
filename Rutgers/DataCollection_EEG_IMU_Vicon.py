@@ -55,7 +55,14 @@ timeLastRun = timeCurrent
 #Setup
 if __name__ == "__main__":
 
-
+    EEG_enable = True
+        
+    if EEG_enable is True:
+        
+        (parent_conn_EEG, child_conn_EEG) = Pipe()
+        sender_EEG = Process(target = async_EEG, args = (parent_conn_EEG,))
+        sender_EEG.start()
+    #########################################################################################
     # IMU_stream
     serial_connection = IMU_init()
     (parent_conn_IMU, child_conn_IMU) = Pipe()
@@ -97,7 +104,7 @@ if __name__ == "__main__":
     output_idx_list = []
     data_record_list = []
 
-    header = "frame\tfrequency\tVicon\tIMU"
+    header = "frame\tfrequency\tEEG\tVicon\tIMU"
     
     file1.write(header)
 
@@ -120,12 +127,23 @@ if __name__ == "__main__":
 
             data_record = [current_frame, current_freq]
             
+            ###EEG###   
+            if EEG_enable is True:
+                EEG_data = child_conn_EEG.recv()
+            
+                if not EEG_data:
+                    EEG_data = [0] * 38
+            
+                data_record.extend(EEG_data)
+            else:
+                EEG_data = [0] * 38
+                data_record.extend(EEG_data)
 
             vicon_data_flat = []
             if vicon_enable:
                 #print("here")
                 vicon_data = child_conn_vicon.recv()
-                vicon_data_list = [None] * 39 # number of markers * 3
+                vicon_data_list = [None] * 48 # number of markers * 3
                 # if vicon_data[0] is not None:
                     # print("VICON data:", vicon_data[0])
                 for i, data in enumerate(vicon_data):
@@ -135,7 +153,7 @@ if __name__ == "__main__":
                         data_list = [None] * 3
                 # vicon_data_list = [x.tolist() for x in vicon_data]
                     vicon_data_list[i*3:i*3+3] = data_list
-                assert len(vicon_data_list) == 39
+                assert len(vicon_data_list) == 48
                 vicon_data_flat = vicon_data_list
                 # vicon_data_flat = [item for x in vicon_data_list for item in x]
                     # print("VICON data:", vicon_data_flat[0:3])
@@ -145,9 +163,9 @@ if __name__ == "__main__":
           
             
             if not IMU_data:
-                IMU_data = [None] * 63
+                IMU_data = [None] * 18
             if not vicon_data_flat:
-                vicon_data_flat = [None] * 39 # change this number to number of markers * 3
+                vicon_data_flat = [None] * 48 # change this number to number of markers * 3
 
             if vicon_enable:
                 data_record.extend(vicon_data_flat)
