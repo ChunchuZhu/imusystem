@@ -101,10 +101,9 @@ if __name__ == "__main__":
     
     file1.write(header)
 
-    #  Zero y_angles
     IMU_data = child_conn_IMU.recv()
     print('IMU received')
-    #print('total Length',len(IMU_data))
+
 
     try:
         while True:
@@ -119,7 +118,6 @@ if __name__ == "__main__":
             current_freq = 1/(time.time() - time_start)
 
             data_record = [current_frame, current_freq]
-            
 
             vicon_data_flat = []
             if vicon_enable:
@@ -140,9 +138,6 @@ if __name__ == "__main__":
                 # vicon_data_flat = [item for x in vicon_data_list for item in x]
                     # print("VICON data:", vicon_data_flat[0:3])
             # print('Vicon received')
-
-            
-          
             
             if not IMU_data:
                 IMU_data = [None] * 63
