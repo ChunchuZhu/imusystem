@@ -4,7 +4,7 @@ union u_tag {
   float fval;
 } u;
 float IMUdata[98] = {0};
-int iiii=0;
+int iiii = 0;
 void IMU::Packet_Decode(uint8_t c)
 {
   switch (st)
@@ -16,7 +16,7 @@ void IMU::Packet_Decode(uint8_t c)
         Datain[read_count] = c;
         read_count += 1;
         //      Serial.print(read_count);
-//          S/erial.print("3a");
+        //          Serial.print("3a");
       }
       break;
     case 1: //Read 2nd Byte
@@ -25,7 +25,7 @@ void IMU::Packet_Decode(uint8_t c)
         st = 2;
         Datain[read_count] = c;
         read_count += 1;
-//        Serial.print(/"88");
+        //        Serial.print("88");
       }
       else
       {
@@ -39,7 +39,7 @@ void IMU::Packet_Decode(uint8_t c)
         st = 3;
         Datain[read_count] = c;
         read_count += 1;
-//        Serial.print/("01");
+        //        Serial.print("01");
       }
       else
       {
@@ -73,13 +73,12 @@ void IMU::INIT()
 
 void IMU::READ()
 {
-
   // if (Serial.available()){
   //   serial1Flag = 1;
   // }
   if (SERIAL_WL.available())
   {
-//      Serial.pri/nt("00");
+    //    Serial.print("00");
     ch = SERIAL_WL.read();
     serial2Flag = 1;
     Packet_Decode(ch);
@@ -151,7 +150,7 @@ void IMU::processData()
   LSLAx = IMUdata[63];
   LSLAy = IMUdata[64];
   LSLAz = IMUdata[65];
-   // Right Heel
+  // Right Heel
   RHAVx = IMUdata[71];
   RHAVy = IMUdata[72];
   RHAVz = IMUdata[73];
@@ -161,7 +160,6 @@ void IMU::processData()
   RHLAx = IMUdata[77];
   RHLAy = IMUdata[78];
   RHLAz = IMUdata[79];
-
  // Left Heel
   LHAVx = IMUdata[85];
   LHAVy = IMUdata[86];
@@ -171,7 +169,8 @@ void IMU::processData()
   LHEulerz = IMUdata[90];
   LHLAx = IMUdata[91];
   LHLAy = IMUdata[92];
-  LSLAz = IMUdata[93];
+  LHLAz = IMUdata[93];
+
   
   Serial.print(TKAVx);
   Serial.print(",");
@@ -207,95 +206,97 @@ void IMU::processData()
   Serial.print(",");
   Serial.print(RTEulery);
   Serial.print(",");
-  Serial.println(RTEulerz);
-//  Serial.print(",");
-//  Serial.print(LTAVx);
-//  Serial.print(",");
-//  Serial.print(LTAVy);
-//  Serial.print(",");
-//  Serial.print(LTAVz);
-//  Serial.print(",");
-//  Serial.print(LTLAx);
-//  Serial.print(",");
-//  Serial.print(LTLAy);
-//  Serial.print(",");
-//  Serial.print(LTLAz);
-//  Serial.print(",");
-//  Serial.print(LTEulerx);
-//  Serial.print(",");
-//  Serial.print(LTEulery);
-//  Serial.print(",");
-//  Serial.print(LTEulerz);
-//  Serial.print(",");
-//  Serial.print(RSAVx);
-//  Serial.print(",");
-//  Serial.print(RSAVy);
-//  Serial.print(",");
-//  Serial.print(RSAVz);
-//  Serial.print(",");
-//  Serial.print(RSLAx);
-//  Serial.print(",");
-//  Serial.print(RSLAy);
-//  Serial.print(",");
-//  Serial.print(RSLAz);
-//  Serial.print(",");
-//  Serial.print(RSEulerx);
-//  Serial.print(",");
-//  Serial.print(RSEulery);
-//  Serial.print(",");
-//  Serial.print(RSEulerz);
-//  Serial.print(",");
-//  Serial.print(LSAVx);
-//  Serial.print(",");
-//  Serial.print(LSAVy);
-//  Serial.print(",");
-//  Serial.print(LSAVz);
-//  Serial.print(",");
-//  Serial.print(LSLAx);
-//  Serial.print(",");
-//  Serial.print(LSLAy);
-//  Serial.print(",");
-//  Serial.print(LSLAz);
-//  Serial.print(",");
-//  Serial.print(LSEulerx);
-//  Serial.print(",");
-//  Serial.print(LSEulery);
-//  Serial.print(",");
-//  Serial.print(LSEulerz);
-//  Serial.print(",");
-//  Serial.print(RHAVx);
-//  Serial.print(",");
-//  Serial.print(RHAVy);
-//  Serial.print(",");
-//  Serial.print(RHAVz);
-//  Serial.print(",");
-//  Serial.print(RHLAx);
-//  Serial.print(",");
-//  Serial.print(RHLAy);
-//  Serial.print(",");
-//  Serial.print(RHLAz);
-//  Serial.print(",");
-//  Serial.print(RHEulerx);
-//  Serial.print(",");
-//  Serial.print(RHEulery);
-//  Serial.print(",");
-//  Serial.print(RHEulerz);
-//  Serial.print(",");
-//  Serial.print(LHAVx);
-//  Serial.print(",");
-//  Serial.print(LHAVy);
-//  Serial.print(",");
-//  Serial.print(LHAVz);
-//  Serial.print(",");
-//  Serial.print(LHLAx);
-//  Serial.print(",");
-//  Serial.print(LHLAy);
-//  Serial.print(",");
-//  Serial.print(LHLAz);
-//  Serial.print(",");
-//  Serial.print(LHEulerx);
-//  Serial.print(",");
-//  Serial.print(LHEulery);
-//  Serial.print(",");
-//  Serial.println(LHEulerz);
+  Serial.print(RTEulerz);
+  Serial.print(",");
+  Serial.print(LTAVx);
+  Serial.print(",");
+  Serial.print(LTAVy);
+  Serial.print(",");
+  Serial.print(LTAVz);
+  Serial.print(",");
+  Serial.print(LTLAx);
+  Serial.print(",");
+  Serial.print(LTLAy);
+  Serial.print(",");
+  Serial.print(LTLAz);
+  Serial.print(",");
+  Serial.print(LTEulerx);
+  Serial.print(",");
+  Serial.print(LTEulery);
+  Serial.print(",");
+  Serial.print(LTEulerz);
+  Serial.print(",");
+  Serial.print(RSAVx);
+  Serial.print(",");
+  Serial.print(RSAVy);
+  Serial.print(",");
+  Serial.print(RSAVz);
+  Serial.print(",");
+  Serial.print(RSLAx);
+  Serial.print(",");
+  Serial.print(RSLAy);
+  Serial.print(",");
+  Serial.print(RSLAz);
+  Serial.print(",");
+  Serial.print(RSEulerx);
+  Serial.print(",");
+  Serial.print(RSEulery);
+  Serial.print(",");
+  Serial.print(RSEulerz);
+  Serial.print(",");
+  Serial.print(LSAVx);
+  Serial.print(",");
+  Serial.print(LSAVy);
+  Serial.print(",");
+  Serial.print(LSAVz);
+  Serial.print(",");
+  Serial.print(LSLAx);
+  Serial.print(",");
+  Serial.print(LSLAy);
+  Serial.print(",");
+  Serial.print(LSLAz);
+  Serial.print(",");
+  Serial.print(LSEulerx);
+  Serial.print(",");
+  Serial.print(LSEulery);
+  Serial.print(",");
+  Serial.print(LSEulerz);
+  Serial.print(",");
+  Serial.print(RHAVx);
+  Serial.print(",");
+  Serial.print(RHAVy);
+  Serial.print(",");
+  Serial.print(RHAVz);
+  Serial.print(",");
+  Serial.print(RHLAx);
+  Serial.print(",");
+  Serial.print(RHLAy);
+  Serial.print(",");
+  Serial.print(RHLAz);
+  Serial.print(",");
+  Serial.print(RHEulerx);
+  Serial.print(",");
+  Serial.print(RHEulery);
+  Serial.print(",");
+  Serial.print(RHEulerz);
+  Serial.print(",");
+  Serial.print(LHAVx);
+  Serial.print(",");
+  Serial.print(LHAVy);
+  Serial.print(",");
+  Serial.print(LHAVz);
+  Serial.print(",");
+  Serial.print(LHLAx);
+  Serial.print(",");
+  Serial.print(LHLAy);
+  Serial.print(",");
+  Serial.print(LHLAz);
+  Serial.print(",");
+  Serial.print(LHEulerx);
+  Serial.print(",");
+  Serial.print(LHEulery);
+  Serial.print(",");
+  Serial.println(LHEulerz);
+ 
+
 }

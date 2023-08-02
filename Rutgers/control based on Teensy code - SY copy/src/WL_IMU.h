@@ -5,7 +5,7 @@
 
 // SERIAL_WL for wireless serial
 // Yellow 3.3V    White RX    Red TX    Black GROUND
-#define SERIAL_WL (Serial2)
+#define SERIAL_WL (Serial3)
 #define INIT_TIME (4) // unit : second
 
 typedef float CAL_TYPE;
@@ -154,7 +154,7 @@ public:
   CAL_TYPE LSqB=0;
   CAL_TYPE LSqC=0;
   CAL_TYPE LSqD=0;
-
+  
    // Right Heel
   CAL_TYPE RHAVx=0;
   CAL_TYPE RHAVy=0;
@@ -183,6 +183,7 @@ public:
   CAL_TYPE LHqB=0;
   CAL_TYPE LHqC=0;
   CAL_TYPE LHqD=0;
+
 
   
   CAL_TYPE LKx=0; 
