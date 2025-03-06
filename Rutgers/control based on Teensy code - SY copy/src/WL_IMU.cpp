@@ -171,7 +171,16 @@ void IMU::processData()
   LHLAy = IMUdata[92];
   LHLAz = IMUdata[93];
 
-  
+  // you can also use Serial.write()  
+  // connect the teensy to PC using serial
+  // ON your PC, use Serial.read (Python) to read the data
+  // High level controller also on linux
+  // options can be: 1. write a control mode to teensy and do the torque calculation on teensy
+  // 2. calculate the torque on linux and write the torque directly to teensy.
+
+//   If you only need to recored IMU data , you only need to stream the IMU data to PC via serial
+//   You can set the current command to 0;
+
   Serial.print(TKAVx);
   Serial.print(",");
   Serial.print(TKAVy);
@@ -297,6 +306,5 @@ void IMU::processData()
   Serial.print(LHEulery);
   Serial.print(",");
   Serial.println(LHEulerz);
- 
 
 }
