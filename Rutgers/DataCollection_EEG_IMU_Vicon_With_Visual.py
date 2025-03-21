@@ -51,17 +51,19 @@ if __name__ == "__main__":
         sender_EEG.start()
     #########################################################################################
     # IMU_stream
-    serial_connection = IMU_init()
-    (parent_conn_IMU, child_conn_IMU) = Pipe()
-    sender_IMU = Process(target = async_IMU, args = (parent_conn_IMU, serial_connection))
-    sender_IMU.start()
+    IMU_enable = False
+    if IMU_enable:
+        serial_connection = IMU_init()
+        (parent_conn_IMU, child_conn_IMU) = Pipe()
+        sender_IMU = Process(target = async_IMU, args = (parent_conn_IMU, serial_connection))
+        sender_IMU.start()
     #########################################################################################
 
     #########################################################################################
     # vicon_stream, subject_name, marker_count = vicon_init("192.168.10.203")
     IP_ADDRESS = "10.0.0.10"
     # IP_ADDRESS = "192.168.1.6"
-    vicon_enable = True
+    vicon_enable = False
     #########################################################################################
 
 
@@ -95,9 +97,9 @@ if __name__ == "__main__":
     
     file1.write(header)
 
-    #  Zero y_angles
-    IMU_data = child_conn_IMU.recv()
-    print('IMU received')
+    if IMU_enable:#  Zero y_angles
+        IMU_data = child_conn_IMU.recv()
+        print('IMU received')
     #print('total Length',len(IMU_data))
 
     ID = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
@@ -133,7 +135,7 @@ if __name__ == "__main__":
                     wave_obj.play()
                     Sound_Played = 1
 
-            if 6 < current_time - previous_time < 9:
+            if 6 < current_time - previous_time < 16:
                 if Figure_Played == 0:
                     random_index = random.randrange(len(ID))
                     current_ID = ID[random_index]
@@ -141,18 +143,18 @@ if __name__ == "__main__":
                     np.delete(ID, random_index)
                     Figure_Played = 1
                     if current_ID == 1:
-                        image = mpimg.imread("/Users/chunchu/GitHub/imusystem/Rutgers/images/left.jpg")
+                        image = mpimg.imread("/Users/chunchu/GitHub/imusystem/Rutgers/images/LeftItem.jpg")
                         plt.figure(figsize=(20, 12))
                         plt.imshow(image, interpolation='nearest', aspect='auto')
                         plt.show()
 
                     if current_ID == 2:
-                        image = mpimg.imread("/Users/chunchu/GitHub/imusystem/Rutgers/images/right.jpg")
+                        image = mpimg.imread("/Users/chunchu/GitHub/imusystem/Rutgers/images/RightItem.jpg")
                         plt.figure(figsize=(20, 12))
                         plt.imshow(image, interpolation='nearest', aspect='auto')
                         plt.show()
 
-            if current_time - previous_time > 9 and current_time - previous_time > 11:
+            if current_time - previous_time > 16 and current_time - previous_time < 21:
                 if Relax_Played == 0:
                     image = mpimg.imread("/Users/chunchu/GitHub/imusystem/Rutgers/images/Relax.jpg")
                     plt.figure(figsize=(20, 12))
@@ -161,7 +163,7 @@ if __name__ == "__main__":
                     Relax_Played = 1
                     current_ID = 0
 
-            if current_time - previous_time > 11:
+            if current_time - previous_time > 21:
                 Sound_Played = 0
                 Ready_Played = 0
                 Relax_Played = 0
@@ -172,7 +174,7 @@ if __name__ == "__main__":
             if count == 20:
                 break
 
-            IMU_data = child_conn_IMU.recv()
+            # IMU_data = child_conn_IMU.recv()
 
             current_freq = 1/(time.time() - time_start)
 
